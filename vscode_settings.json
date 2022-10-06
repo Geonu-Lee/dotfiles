@@ -1,0 +1,312 @@
+{
+  "terminal.external.osxExec": "iTerm.app",
+  "terminal.integrated.fontFamily": "MesloLGS NF",
+  "editor.fontFamily": "'Fira Code'",
+  "editor.fontLigatures": true,
+  "files.autoSave": "onFocusChange",
+  "editor.cursorSurroundingLines": 10,
+  "vim.easymotion": true,
+  "vim.incsearch": true,
+  "vim.useSystemClipboard": true,
+  "vim.useCtrlKeys": true,
+  "vim.hlsearch": true,
+  "vim.sneak": true,
+  "vim.normalModeKeyBindings": [
+    {
+      "before": [
+        "S-H"
+      ],
+      "commands": [
+        "workbench.action.previousEditor"
+      ]
+    },
+    {
+      "before": [
+        "S-L"
+      ],
+      "commands": [
+        "workbench.action.nextEditor"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "t"
+      ],
+      "commands": [
+        "workbench.action.toggleSidebarVisibility"
+      ],
+      // "commands": ["workbench.view.explorer"]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w"
+      ],
+      "commands": [
+        "workbench.action.files.save"
+      ],
+    },
+    {
+      "before": [
+        "<leader>",
+        "/"
+      ],
+      "commands": [
+        "editor.action.commentLine"
+      ],
+    },
+    {
+      "before": [
+        "<leader>",
+        "/"
+      ],
+      "commands": [
+        "editor.action.commentLine"
+      ],
+    },
+    {
+      "before": [
+        "<leader>",
+        "/"
+      ],
+      "commands": [
+        "editor.action.commentLine"
+      ],
+    }
+  ],
+  "vim.visualModeKeyBindings": [
+    {
+      "before": [
+        "<leader>",
+        "/"
+      ],
+      "commands": [
+        "editor.action.commentLine"
+      ],
+    },
+    {
+      "before": [
+        ">"
+      ],
+      "commands": [
+        "editor.action.indentLines"
+      ]
+    },
+    {
+      "before": [
+        "<"
+      ],
+      "commands": [
+        "editor.action.outdentLines"
+      ]
+    }
+  ],
+  "vim.insertModeKeyBindings": [],
+  "vim.normalModeKeyBindingsNonRecursive": [
+    // {
+    //   "before": ["<leader>", "t"],
+    //   "commands": ["workbench.action.toggleSidebarVisibility"]
+    // },
+    {
+      "before": [
+        "<leader>",
+        "h"
+      ],
+      "after": [
+        "_"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "l"
+      ],
+      "after": [
+        "$"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "s"
+      ],
+      "commands": [
+        "workbench.action.splitEditor"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "]"
+      ],
+      "commands": [
+        "workbench.action.increaseViewWidth"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "["
+      ],
+      "commands": [
+        "workbench.action.decreaseViewWidth"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "="
+      ],
+      "commands": [
+        "workbench.action.decreaseViewHeight"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "-"
+      ],
+      "commands": [
+        "workbench.action.increaseViewHeight"
+      ]
+    },
+    {
+      "before": [
+        ">"
+      ],
+      "commands": [
+        "editor.action.indentLines"
+      ]
+    },
+    {
+      "before": [
+        "<"
+      ],
+      "commands": [
+        "editor.action.outdentLines"
+      ]
+    }
+  ],
+  "vim.leader": "<space>",
+  "vim.handleKeys": {
+    "<C-a>": false,
+    "<C-f>": false,
+    // VS Code new marker @ next occurence
+    // Copy
+    "<C-c>": false,
+    // Cut
+    "<C-x>": false,
+    // Paste
+    "<C-z>": false,
+    "<C-y>": false,
+    "<C-h>": false,
+  },
+  "editor.renderWhitespace": "none",
+  "workbench.colorCustomizations": {
+    "breadcrumb.foreground": "#d5e957",
+    "breadcrumb.focusForeground": "#f17c58",
+    "statusBar.debuggingBackground": "#28684a",
+    "statusBar.noFolderBackground": "#38386b",
+    "statusBar.background": "#492579",
+    "editor.lineHighlightBackground": "#404346",
+    "editor.lineHighlightBorder": "#404346",
+    "editor.selectionBackground": "#2f4d50",
+    "editorLineNumber.activeForeground": "#def50c",
+    "[Dracula]": {
+      "panel.dropBorder": "#4e4b66",
+      "editorGroup.border": "#4e4b66",
+      "terminal.border": "#2b2828",
+      "panel.border": "#1a1919",
+      "panelInput.border": "#1a1919",
+      "panelSection.border": "#1a1919",
+      "peekViewEditor.matchHighlightBackground": "#275f48",
+      "peekViewEditor.background": "#081930",
+      // "sideBar.background": "#1a1919",
+      "sideBarSectionHeader.foreground": "#cac4f3",
+      // "terminal.background": "#0f0f0f",
+      // "panel.background": "#1a1919",
+      "panelTitle.activeForeground": "#d0dd56",
+      "tab.unfocusedActiveBackground": "#282A36",
+      "tab.activeForeground": "#e0932d",
+      "tab.activeBorder": "#FF79C6",
+      "tab.activeBorderTop": "#282A36",
+      "editorIndentGuide.activeBackground": "#25813c",
+    }
+  },
+  "vim.vimrc.enable": true,
+  "vim.vimrc.path": "~/.vimrc",
+  "workbench.editor.showTabs": true,
+  "zenMode.hideTabs": false,
+  "zenMode.hideLineNumbers": false,
+  "zenMode.hideStatusBar": false,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.suggestSelection": "first",
+  "sync.gist": "f864a35b6aca10b5f46dd9101530adcd",
+  "terminal.integrated.gpuAcceleration": "off",
+  "workbench.colorTheme": "Dracula",
+  "editor.minimap.enabled": false,
+  "editor.fontSize": 14,
+  "editor.mouseWheelZoom": true,
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "code-runner.executorMap": {
+    "javascript": "node",
+    "java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
+    "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+    // "cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+    "cpp": "g++ $fileName `pkg-config opencv --cflags --libs` -o file && ./file",
+    "objective-c": "cd $dir && gcc -framework Cocoa $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+    "php": "php",
+    "python": "python3 -u",
+    "perl": "perl",
+    "perl6": "perl6",
+    "ruby": "ruby",
+    "go": "go run",
+    "lua": "lua",
+    "groovy": "groovy",
+    "powershell": "powershell -ExecutionPolicy ByPass -File",
+    "bat": "cmd /c",
+    "shellscript": "bash",
+    "fsharp": "fsi",
+    "csharp": "scriptcs",
+    "vbscript": "cscript //Nologo",
+    "typescript": "ts-node",
+    "coffeescript": "coffee",
+    "scala": "scala",
+    "swift": "swift",
+    "julia": "julia",
+    "crystal": "crystal",
+    "ocaml": "ocaml",
+    "r": "Rscript",
+    "applescript": "osascript",
+    "clojure": "lein exec",
+    "haxe": "haxe --cwd $dirWithoutTrailingSlash --run $fileNameWithoutExt",
+    // "rust": "cd $dir && rustc $fileName && $dir$fileNameWithoutExt",
+    "rust": "cargo run # $fileName",
+    "racket": "racket",
+    "scheme": "csi -script",
+    "ahk": "autohotkey",
+    "autoit": "autoit3",
+    "dart": "dart",
+    "pascal": "cd $dir && fpc $fileName && $dir$fileNameWithoutExt",
+    "d": "cd $dir && dmd $fileName && $dir$fileNameWithoutExt",
+    "haskell": "runhaskell",
+    "nim": "nim compile --verbosity:0 --hints:off --run",
+    "lisp": "sbcl --script",
+    "kit": "kitc --run",
+    "v": "v run",
+    "sass": "sass --style expanded",
+    "scss": "scss --style expanded",
+    "less": "cd $dir && lessc $fileName $fileNameWithoutExt.css",
+    "FortranFreeForm": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+    "fortran-modern": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+    "fortran_fixed-form": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+    "fortran": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+    "sml": "cd $dir && sml $fileName"
+  },
+  "cmake.configureOnOpen": true,
+  "editor.hover.enabled": true,
+  "editor.codeLens": true,
+}
