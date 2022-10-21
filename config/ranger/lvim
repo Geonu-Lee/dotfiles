@@ -1,0 +1,23 @@
+[?1049h[22;0t[?1h[H[2J]11;?[?2004h[?u[c[?12h[?25h[?25l(B[m[H[2J]112[2 q[96m# This is a sample commands.py.  You can add your own commands here.(B[m[K
+[96m#(B[m[K
+[96m# Please refer to commands_full.py for all the default commands and a complete(B[m[K
+[96m# documentation.  Do NOT add them all here, or you may end up with defunct(B[m[K
+[96m# commands when upgrading ranger.(B[m[K
+[K
+[96m# A simple command for demonstration purposes follows.(B[m[K
+[96m# -----------------------------------------------------------------------------(B[m[K
+[K
+[38;5;81mfrom(B[m __future__ [38;5;81mimport(B[m (absolute_import, division, print_function)[K
+[K
+[96m# You can import any python module as needed.(B[m[K
+[38;5;81mimport(B[m os[K
+[K
+[96m# You always need to import ranger.api.commands here to get the Command class:(B[m[K
+[38;5;81mfrom(B[m ranger.api.commands [38;5;81mimport(B[m Command[K
+[K
+[K
+[96m# Any class that is a subclass of "Command" will be integrated into ranger as a(B[m[K
+[96m# command.  Try typing ":my_edit<ENTER>" in ranger!(B[m[K
+[93mclass(B[m (B[0;1m[96mmy_edit(B[m(Command):[K
+    [96m# The so-called doc-string of the class will be visible in the built-in(B[m[K
+(B[0;1;7mcommands.py                                                   1,1            Top]112[2 q[H[?12h[?25h[?25l[?1004h[?12h[?25h
