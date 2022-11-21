@@ -1,0 +1,12 @@
+#!/bin/sh
+
+USER="leejongjin2"
+TOKEN="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"
+
+notifications=$(echo "user = \"$USER:$TOKEN\"" | curl -sf -K- https://api.github.com/notifications | jq ".[].unread" | grep -c true)
+
+if [ "$notifications" -gt 0 ]; then
+    echo "$notifications"
+else
+    echo "0"
+fi

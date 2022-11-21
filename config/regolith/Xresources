@@ -1,0 +1,13 @@
+
+! -- Applications
+! These files map values defined above into specific app settings.
+! -- Applications
+! These files map values defined above into specific app settings.
+
+i3-wm.gaps.inner.size: 20
+i3-wm.gaps.outer.size: 6
+i3-wm.bar.position: top
+i3-wm.program.unclutter: 
+i3-wm.window.border.size: 0
+i3-wm.floatingwindow.border.size: 0
+
