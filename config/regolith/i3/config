@@ -649,7 +649,7 @@ set_from_resource $i3-wm.bar.status_command i3-wm.bar.status_command i3xrocks -u
 #   }
 # }
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
-
+exec_always --no-startup-id dunst -config ~/.config/dunst/dunstrc
 ###############################################################################
 # External programs launched with i3
 ###############################################################################
