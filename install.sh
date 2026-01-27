@@ -21,9 +21,27 @@ print_done() {
 # 1. 필수 패키지 설치
 print_step "필수 패키지 설치..."
 sudo apt update
-sudo apt install -y git curl tmux fzf xclip unzip fontconfig
+sudo apt install -y git curl fzf xclip unzip fontconfig
 
-# 2. yazi 설치 (최신 바이너리)
+# 2. zoxide 설치
+print_step "zoxide 설치..."
+if ! command -v zoxide &> /dev/null; then
+    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+    print_done "zoxide 설치 완료"
+else
+    print_done "zoxide 이미 설치됨"
+fi
+
+# 3. superfile 설치
+print_step "superfile 설치..."
+if ! command -v spf &> /dev/null; then
+    curl -sSL https://superfile.netlify.app/install.sh | bash
+    print_done "superfile 설치 완료"
+else
+    print_done "superfile 이미 설치됨"
+fi
+
+# 4. yazi 설치 (최신 바이너리)
 print_step "yazi 설치..."
 if ! command -v yazi &> /dev/null; then
     YAZI_VERSION=$(curl -s https://api.github.com/repos/sxyazi/yazi/releases/latest | grep tag_name | cut -d '"' -f 4)
@@ -37,34 +55,34 @@ else
     print_done "yazi 이미 설치됨"
 fi
 
-# 3. yazi 의존성 (이미지/PDF 프리뷰용)
-print_step "yazi 의존성 설치..."
-sudo apt install -y ffmpegthumbnailer poppler-utils
-
-# 4. tmux 설정 복사
-print_step "tmux 설정 복사..."
-mkdir -p ~/.config/tmux
-cp tmux/tmux.conf ~/.config/tmux/tmux.conf
-cp tmux/tmux.reset.conf ~/.config/tmux/tmux.reset.conf
-ln -sf ~/.config/tmux/tmux.conf ~/.tmux.conf
-print_done "tmux 설정 완료"
-
-# 5. TPM (Tmux Plugin Manager) 설치
-print_step "TPM 설치..."
-if [ ! -d ~/.tmux/plugins/tpm ]; then
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-    print_done "TPM 설치 완료"
-else
-    print_done "TPM 이미 설치됨"
-fi
-
-# 6. yazi 설정 복사
+# 5. yazi 설정 복사
 print_step "yazi 설정 복사..."
 mkdir -p ~/.config/yazi
 cp yazi/yazi.toml ~/.config/yazi/yazi.toml
 print_done "yazi 설정 완료"
 
-# 7. Nerd Font 설치 (아이콘용)
+# 6. superfile 설정 복사
+print_step "superfile 설정 복사..."
+mkdir -p ~/.config/superfile
+if [ -f superfile/config.toml ]; then
+    cp superfile/config.toml ~/.config/superfile/config.toml
+    print_done "superfile 설정 완료"
+else
+    print_done "superfile 기본 설정 사용"
+fi
+
+# 7. zshrc에 zoxide 초기화 추가
+print_step "zoxide 설정..."
+if ! grep -q 'eval "$(zoxide init' ~/.zshrc 2>/dev/null; then
+    echo '' >> ~/.zshrc
+    echo '# zoxide - smarter cd' >> ~/.zshrc
+    echo 'eval "$(zoxide init zsh)"' >> ~/.zshrc
+    print_done "zoxide zshrc 설정 완료"
+else
+    print_done "zoxide zshrc 이미 설정됨"
+fi
+
+# 8. Nerd Font 설치 (아이콘용)
 print_step "Nerd Font 설치..."
 FONT_DIR="$HOME/.local/share/fonts"
 if [ ! -f "$FONT_DIR/FiraCodeNerdFont-Regular.ttf" ]; then
@@ -83,15 +101,17 @@ echo "=========================================="
 echo -e "${GREEN}✅ 설치 완료!${NC}"
 echo "=========================================="
 echo ""
-echo "다음 단계:"
-echo "  1. tmux 실행: tmux"
-echo "  2. TPM 플러그인 설치: Ctrl+A I (대문자 I)"
-echo "  3. tmux 재시작"
+echo "사용법:"
+echo "  spf       → superfile 파일 매니저"
+echo "  yazi      → yazi 파일 매니저"
+echo "  z <dir>   → zoxide (스마트 cd)"
+echo "  zi        → zoxide interactive"
 echo ""
-echo "단축키:"
-echo "  Ctrl+A s  → 세션 선택 (fzf)"
-echo "  Ctrl+A S  → 새 세션 생성"
-echo "  Ctrl+A f  → yazi 파일 매니저"
-echo "  Ctrl+A p  → floax 팝업"
-echo "  Ctrl+A g  → SSH 호스트 선택"
+echo "superfile 단축키:"
+echo "  e         → 파일 편집 (nvim)"
+echo "  q         → 종료"
+echo "  h/l       → 패널 이동"
+echo "  j/k       → 위/아래 이동"
+echo ""
+echo "※ 새 터미널을 열거나 'source ~/.zshrc' 실행"
 echo ""

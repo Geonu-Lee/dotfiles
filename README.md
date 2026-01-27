@@ -1,8 +1,8 @@
-# Dotfiles (Ubuntu Server)
+# Dotfiles
 
-tmux + yazi 설정 for Ubuntu
+## Ubuntu Server (install.sh)
 
-## 설치
+zoxide + superfile + yazi 설정
 
 ```bash
 git clone <this-repo> ~/dotfiles
@@ -10,30 +10,63 @@ cd ~/dotfiles
 ./install.sh
 ```
 
-## 설치되는 것
+### 설치되는 것
 
-- **tmux**: 터미널 멀티플렉서 + Catppuccin 테마
+- **zoxide**: 스마트 cd (디렉토리 점프)
+- **superfile**: 듀얼패널 터미널 파일 매니저
 - **yazi**: 터미널 파일 매니저 (이미지 프리뷰 지원)
 - **fzf**: fuzzy finder
-- **TPM**: tmux 플러그인 매니저
+
+## Mac (수동 설치)
+
+### WezTerm
+
+```bash
+cp -r wezterm/* ~/.config/wezterm/
+```
+
+### tmux
+
+```bash
+cp tmux/.tmux.conf ~/.tmux.conf
+cp tmux/tmux.reset.conf ~/.config/tmux/
+cp -r tmux/scripts ~/.config/tmux/
+```
 
 ## 단축키
 
-### tmux (Prefix: Ctrl+A)
+### WezTerm + tmux
 
 | 키 | 기능 |
 |----|------|
-| `s` | 세션 선택 (fzf) |
-| `S` | 새 세션 생성 |
-| `f` | yazi 파일 매니저 |
-| `p` | floax 팝업 |
-| `g` | SSH 호스트 선택 |
-| `v` | 수평 분할 |
-| `s` | 수직 분할 |
-| `hjkl` | pane 이동 |
-| `e/E` | pane 균등 분배 |
-| `z` | pane 줌 |
-| `H/L` | 이전/다음 윈도우 |
+| `Cmd+\` | SSH 호스트 선택 |
+| `Cmd+,` | tmux 세션 선택 |
+| `Cmd+Shift+N` | 새 세션 생성 |
+| `Cmd+t` | 새 윈도우 |
+| `Cmd+w` | 윈도우/pane 닫기 |
+| `Cmd+1~5` | 윈도우 이동 |
+| `Cmd+Shift+D` | 수직 분할 |
+| `Cmd+Shift+E` | 수평 분할 |
+| `Ctrl+hjkl` | pane 이동 |
+| `Cmd+z` | pane 줌 |
+| `Cmd+f` | yazi 파일 매니저 |
+| `Cmd+Shift+B` | 배경화면 토글 |
+
+### zoxide
+
+```bash
+z <dir>     # 스마트 cd
+zi          # interactive 모드
+```
+
+### superfile (spf)
+
+| 키 | 기능 |
+|----|------|
+| `h/l` | 패널 이동 |
+| `j/k` | 위/아래 이동 |
+| `e` | 파일 편집 (nvim) |
+| `q` | 종료 |
 
 ### yazi
 
@@ -42,14 +75,3 @@ cd ~/dotfiles
 | `hjkl` | 이동 |
 | `Enter` | 열기 |
 | `q` | 종료 |
-| `/` | 검색 |
-| `y/p` | 복사/붙여넣기 |
-| `d` | 삭제 |
-
-## WezTerm SSH 연결
-
-Mac에서 WezTerm SSH로 연결하면 이미지 프리뷰도 작동:
-
-```bash
-wezterm ssh user@server
-```

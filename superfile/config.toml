@@ -1,0 +1,10 @@
+# superfile configuration
+
+# 에디터 설정
+editor = "nvim"
+
+# 테마 (catppuccin-mocha)
+theme = "catppuccin-mocha"
+
+# 기본 설정
+default_open_file_preview = true
