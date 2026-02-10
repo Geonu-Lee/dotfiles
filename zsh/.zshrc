@@ -109,6 +109,12 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export LANG=en_US.UTF-8
 export EDITOR=nvim
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow'
+export FZF_DEFAULT_OPTS="--bind 'ctrl-j:down,ctrl-k:up'"
+
+# ============================================================================
+# Starship
+# ============================================================================
+export STARSHIP_CONFIG=~/.config/starship/starship.toml
 
 # ============================================================================
 # History
@@ -127,7 +133,7 @@ setopt APPEND_HISTORY
 # ============================================================================
 setopt prompt_subst
 export KEYTIMEOUT=15
-bindkey jk vi-cmd-mode
+bindkey jj vi-cmd-mode
 bindkey '^F' forward-char
 bindkey '^B' backward-char
 bindkey '^E' end-of-line
@@ -152,7 +158,7 @@ bindkey '^R' history-search-multi-word
 eval "$(zoxide init zsh)"
 
 # ============================================================================
-# Starship
+# Starship (init은 마지막에)
 # ============================================================================
 eval "$(starship init zsh)"
 
@@ -226,6 +232,7 @@ alias massdns='~/hacking/tools/massdns/bin/massdns -r ~/hacking/tools/massdns/li
 alias server='python -m http.server 4445'
 alias tunnel='ngrok http 4445'
 alias fuzz='ffuf -w ~/hacking/SecLists/content_discovery_all.txt -mc all -u'
+alias mat='osascript -e "tell application \"System Events\" to key code 126 using {command down}" && tmux neww "cmatrix"'
 
 # ============================================================================
 # Functions
@@ -248,7 +255,7 @@ alias rr='ranger'
 
 cx() { cd "$@" && l; }
 fcd() { cd "$(find . -type d -not -path '*/.*' | fzf)" && l; }
-f() { echo "$(find . -type f -not -path '*/.*' | fzf)" | xclip -selection clipboard }
+f() { echo "$(find . -type f -not -path '*/.*' | fzf)" | pbcopy }
 fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" }
 
 extract() {
@@ -277,6 +284,13 @@ extract() {
         *)         echo "'$1' - unknown archive type" ;;
     esac
 }
+
+# ============================================================================
+# Nix
+# ============================================================================
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
 
 # ============================================================================
 # Machine-local overrides (cuda, nvim path, etc.)

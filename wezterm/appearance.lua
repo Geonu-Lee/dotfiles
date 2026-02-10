@@ -13,7 +13,7 @@ M.background_image = {
 		source = { Color = "#1e1e2e" }, -- Catppuccin base 색상
 		width = "100%",
 		height = "100%",
-		opacity = 0.6, -- 0.0(투명) ~ 1.0(불투명) - 낮을수록 이미지가 더 보임
+		opacity = 0.1, -- 0.0(투명) ~ 1.0(불투명) - 낮을수록 이미지가 더 보임
 	},
 }
 
@@ -29,7 +29,7 @@ function M.setup(config)
 		top = 4,
 		bottom = 4,
 	}
-	config.window_background_opacity = 0.85
+	config.window_background_opacity = 1.00
 end
 
 return M
