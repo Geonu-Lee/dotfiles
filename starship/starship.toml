@@ -1,0 +1,36 @@
+# Starship - Minimal
+# 한 줄, 경로 + git만. 그 외 전부 off.
+#
+#   ~/projects/myapp main ❯
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = "$directory$git_branch$git_status$character"
+add_newline = false
+
+[directory]
+style = "bold blue"
+truncation_length = 2
+truncation_symbol = "/"
+format = "[$path]($style) "
+
+[git_branch]
+format = "[$branch](dimmed) "
+
+[git_status]
+format = "[$all_status](red)"
+modified = "*"
+staged = ""
+untracked = ""
+conflicted = ""
+renamed = ""
+deleted = ""
+stashed = ""
+ahead = ""
+behind = ""
+diverged = ""
+
+[character]
+success_symbol = "[❯](dimmed)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](dimmed)"
