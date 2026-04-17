@@ -19,9 +19,27 @@ M.background_image = {
 
 function M.setup(config)
 	config.enable_tab_bar = false -- tmux 사용하므로 탭바 숨김
-	config.font = wezterm.font("FiraCode Nerd Font")
+	config.font = wezterm.font_with_fallback({
+		"FiraCode Nerd Font",
+		"MesloLGS NF",
+		"Symbols Nerd Font",
+		"Apple Color Emoji",
+	})
 	config.font_size = 15
-	config.color_scheme = "Catppuccin Mocha"
+
+	-- Dracula 공식 팔레트 직접 적용
+	config.colors = {
+		foreground = "#f8f8f2",
+		background = "#282a36",
+		cursor_bg = "#f8f8f2",
+		cursor_fg = "#282a36",
+		cursor_border = "#f8f8f2",
+		selection_fg = "#f8f8f2",
+		selection_bg = "#44475a",
+		ansi = { "#21222c", "#ff5555", "#50fa7b", "#f1fa8c", "#bd93f9", "#ff79c6", "#8be9fd", "#f8f8f2" },
+		brights = { "#6272a4", "#ff6e6e", "#69ff94", "#ffffa5", "#d6acff", "#ff92df", "#a4ffff", "#ffffff" },
+	}
+
 	config.window_decorations = "RESIZE"
 	config.window_padding = {
 		left = 4,

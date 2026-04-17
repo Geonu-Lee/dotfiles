@@ -51,11 +51,15 @@ function M.setup()
 		{ key = "phys:D", mods = "CMD|SHIFT", action = wezterm.action.SendString("\x02" .. "s") }, -- 수직 분할
 		{ key = "phys:E", mods = "CMD|SHIFT", action = wezterm.action.SendString("\x02" .. "v") }, -- 수평 분할
 
-		-- tmux Pane 이동 (Cmd+방향키)
+		-- tmux Pane 이동 (Cmd+방향키 / Cmd+hjkl)
 		{ key = "LeftArrow", mods = "CMD", action = wezterm.action.SendString("\x02" .. "h") },
 		{ key = "RightArrow", mods = "CMD", action = wezterm.action.SendString("\x02" .. "l") },
 		{ key = "UpArrow", mods = "CMD", action = wezterm.action.SendString("\x02" .. "k") },
 		{ key = "DownArrow", mods = "CMD", action = wezterm.action.SendString("\x02" .. "j") },
+		{ key = "phys:h", mods = "CMD", action = wezterm.action.SendString("\x02" .. "h") },
+		{ key = "phys:l", mods = "CMD", action = wezterm.action.SendString("\x02" .. "l") },
+		{ key = "phys:k", mods = "CMD", action = wezterm.action.SendString("\x02" .. "k") },
+		{ key = "phys:j", mods = "CMD", action = wezterm.action.SendString("\x02" .. "j") },
 
 		-- tmux Pane 크기 조절 (Ctrl+Shift+방향키)
 		{ key = "LeftArrow", mods = "CTRL|SHIFT", action = wezterm.action.SendString("\x02" .. ",") },
@@ -74,19 +78,33 @@ function M.setup()
 		{ key = "phys:p", mods = "CMD", action = wezterm.action.SendString("\x02" .. "p") },
 
 		-- SSH 호스트 선택
-		{ key = "\\", mods = "CMD", action = wezterm.action.SendString("\x02" .. "g") },
+		{ key = "\\", mods = "CTRL", action = wezterm.action.SendString("\x02" .. "g") },
 
 		-- tmux 세션 선택
-		{ key = ",", mods = "CMD", action = wezterm.action.SendString("\x02" .. "s") },
+		{ key = ",", mods = "CTRL", action = wezterm.action.SendString("\x02" .. "s") },
 
 		-- tmux 세션 생성
 		{ key = "phys:N", mods = "CMD|SHIFT", action = wezterm.action.SendString("\x02" .. "S") },
 
 		-- tmuxinator 워크스페이스 선택
-		{ key = "/", mods = "CMD", action = wezterm.action.SendString("\x02" .. "w") },
+		{ key = "/", mods = "CTRL", action = wezterm.action.SendString("\x02" .. "w") },
 
 		-- yazi 파일 매니저
 		{ key = "phys:f", mods = "CMD", action = wezterm.action.SendString("\x02" .. "f") },
+
+		-- 세션 빠른 전환 (Ctrl+숫자)
+		{
+			key = "phys:1", mods = "CTRL",
+			action = wezterm.action_callback(function()
+				wezterm.background_child_process({ "/bin/bash", wezterm.home_dir .. "/.config/tmux/scripts/session-switch.sh", "main" })
+			end),
+		},
+		{
+			key = "phys:2", mods = "CTRL",
+			action = wezterm.action_callback(function()
+				wezterm.background_child_process({ "/bin/bash", wezterm.home_dir .. "/.config/tmux/scripts/session-switch.sh", "servers" })
+			end),
+		},
 	}
 end
 

@@ -1,4 +1,9 @@
 # ============================================================================
+# PATH
+# ============================================================================
+export PATH="/opt/homebrew/bin:$HOME/.local/bin:$HOME/.local/share/pnpm:$PATH"
+
+# ============================================================================
 # Zinit - 플러그인 매니저
 # https://github.com/zdharma-continuum/zinit
 # 첫 실행 시 자동 설치됨
@@ -80,27 +85,16 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
 
 # ============================================================================
-# PATH (portable — 머신별 경로는 ~/.zshrc.local에서 추가)
+# PNPM
 # ============================================================================
-export PATH="$HOME/.local/bin:$HOME/.local/share/pnpm:$PATH"
 export PNPM_HOME="$HOME/.local/share/pnpm"
 
 # ============================================================================
-# NVM (lazy load)
-# nvm/node/npm을 처음 호출할 때만 로드 → 셸 시작 속도 향상
+# NVM
 # ============================================================================
 export NVM_DIR="$HOME/.nvm"
-_lazy_load_nvm() {
-    unset -f nvm node npm npx pnpm claude
-    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-    [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
-}
-nvm()    { _lazy_load_nvm; nvm "$@"; }
-node()   { _lazy_load_nvm; node "$@"; }
-npm()    { _lazy_load_nvm; npm "$@"; }
-npx()    { _lazy_load_nvm; npx "$@"; }
-pnpm()   { _lazy_load_nvm; pnpm "$@"; }
-claude() { _lazy_load_nvm; claude "$@"; }
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # ============================================================================
 # Environment
@@ -200,6 +194,11 @@ alias .....="cd ../../../.."
 alias ......="cd ../../../../.."
 
 # ============================================================================
+# Aliases: SSH (xterm-ghostty terminfo 없는 서버 대응)
+# ============================================================================
+alias ssh='TERM=xterm-256color ssh'
+
+# ============================================================================
 # Aliases: Tools
 # ============================================================================
 alias vim="nvim"
@@ -296,3 +295,6 @@ fi
 # Machine-local overrides (cuda, nvim path, etc.)
 # ============================================================================
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# OpenClaw Completion
+source "/Users/ijongjin/.openclaw/completions/openclaw.zsh"

@@ -1,5 +1,8 @@
 #!/bin/bash
-project=$(/opt/homebrew/bin/tmuxinator list -n | tail -n +2 | tr ' ' '\n' | grep -v '^$' | /opt/homebrew/bin/fzf --prompt='Workspace > ')
+project=$(/opt/homebrew/bin/tmuxinator list -n | tail -n +2 | tr ' ' '\n' | grep -v '^$' | /opt/homebrew/bin/fzf \
+  --prompt=' ❯ ' --pointer='▶' --marker='✓' \
+  --border=none --height=100% --layout=reverse \
+  --color='fg:#f8f8f2,bg:#282a36,hl:#ff79c6,fg+:#ffffff,bg+:#44475a,hl+:#bd93f9,info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6,marker:#50fa7b,header:#6272a4')
 if [ -n "$project" ]; then
     # 세션이 이미 있으면 전환만, 없으면 생성 후 전환
     if /opt/homebrew/bin/tmux has-session -t "$project" 2>/dev/null; then
