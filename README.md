@@ -20,6 +20,8 @@ bash ~/dotfiles/install.sh
 ├── wezterm/                    # WezTerm 터미널 (Mac only)
 ├── yazi/yazi.toml              # yazi 파일 매니저
 ├── superfile/config.toml       # superfile 파일 매니저
+├── claude/                     # Claude Code 설정 (settings + SuperClaude)
+│   └── install.sh              #   → ~/.claude 로 복사 (로컬 전용 파일 보존)
 └── local/.zshrc.local.example  # 머신별 설정 예시
 ```
 
@@ -32,9 +34,33 @@ bash ~/dotfiles/install.sh
 | CLI 도구 | eza, fd, bat, fzf, zoxide, starship, nvm, superfile, yazi |
 | Nerd Font | JetBrainsMono |
 | Symlink | .zshrc, starship.toml, yazi, superfile, tmux (+ wezterm on Mac) |
+| Claude 설정 | `claude/install.sh` 호출 → `~/.claude` 로 복사 |
 | 기본 셸 | zsh로 변경 |
 
 이미 설치된 도구는 자동 스킵 (멱등성).
+
+## Claude Code 설정
+
+`claude/` 디렉토리에 공유 가능한 Claude 설정만 담는다 (자격증명·세션·캐시는 제외).
+
+```bash
+# 단독 실행도 가능 (install.sh에 포함되어 자동 실행됨)
+bash ~/dotfiles/claude/install.sh
+```
+
+| 공유 ✅ | 로컬 전용 ❌ (건드리지 않음) |
+|---------|------------------------------|
+| `settings.json` (플러그인·마켓플레이스 선언) | `.credentials.json` (OAuth/키) |
+| `CLAUDE.md` (개인 전역 지침) | `settings.local.json` (머신별 권한) |
+| | `sessions/` · `history.jsonl` · `cache/` |
+| | `plugins/` · `projects/` · `shell-snapshots/` |
+
+**동작 방식**
+- **복사(copy)** 방식 — 기존 파일은 `~/.claude/.dotfiles-backup.<timestamp>/` 로 백업 후 덮어씀.
+- 내용이 같으면 스킵 (멱등성).
+- **플러그인은 선언적으로 관리**: `plugins/` 캐시(절대경로·stale 상태)는 커밋하지 않고,
+  `settings.json` 의 `enabledPlugins`/마켓플레이스만 공유 → 첫 `claude` 실행 시 자동 재설치.
+- 로그인은 머신마다 `claude` 실행 후 직접 인증.
 
 ## 머신별 설정
 

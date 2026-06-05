@@ -1,2 +1,14 @@
 *.bak.*
 .DS_Store
+
+# Claude Code: 로컬 전용 — 절대 커밋 금지 (혹시라도 claude/ 에 들어오면 차단)
+claude/.credentials.json
+claude/settings.local.json
+claude/sessions/
+claude/cache/
+claude/history.jsonl
+claude/projects/
+claude/plugins/
+claude/shell-snapshots/
+claude/file-history/
+claude/.dotfiles-backup.*
