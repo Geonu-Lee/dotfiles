@@ -79,7 +79,34 @@ if [[ "$OS" == "debian" ]]; then
 fi
 
 # ============================================================================
-# 2. CLI 도구 설치
+# 1.5 Homebrew + Brewfile (macOS)
+#     새 맥 부트스트랩: brew 자체가 없으므로 먼저 설치한 뒤 Brewfile을 적용한다.
+#     --no-upgrade: 없는 것만 설치. 기존 패키지를 대량 업그레이드하지 않는다.
+# ============================================================================
+if [[ "$OS" == "mac" ]]; then
+    echo ""
+    if command -v brew &> /dev/null; then
+        skip "Homebrew"
+    else
+        info "Homebrew 설치 (암호 입력이 필요할 수 있음)..."
+        NONINTERACTIVE=1 /bin/bash -c \
+            "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+            [[ -x "$brew_bin" ]] && eval "$("$brew_bin" shellenv)" && break
+        done
+        command -v brew &> /dev/null || err "Homebrew 설치 실패"
+        ok "Homebrew"
+    fi
+
+    if [[ -f "$DOTFILES/Brewfile" ]]; then
+        info "Brewfile 적용 (앱·CLI 도구 일괄 설치, 시간이 오래 걸릴 수 있음)..."
+        brew bundle install --file="$DOTFILES/Brewfile" --no-upgrade
+        ok "Brewfile"
+    fi
+fi
+
+# ============================================================================
+# 2. CLI 도구 설치 (Debian용 — mac은 위 Brewfile에서 이미 처리됨)
 # ============================================================================
 echo ""
 info "CLI 도구 설치..."
@@ -126,6 +153,18 @@ else
         brew install bat
     fi
     ok "bat"
+fi
+
+# --- jq (Claude Code 상태줄이 사용) ---
+if command -v jq &> /dev/null; then
+    skip "jq"
+else
+    if [[ "$OS" == "debian" ]]; then
+        sudo apt-get install -y -qq jq > /dev/null 2>&1
+    elif [[ "$OS" == "mac" ]]; then
+        brew install jq
+    fi
+    ok "jq"
 fi
 
 # --- fzf ---

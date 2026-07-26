@@ -12,3 +12,6 @@ claude/plugins/
 claude/shell-snapshots/
 claude/file-history/
 claude/.dotfiles-backup.*
+
+# brew bundle 이 생성하는 락파일 (머신별 — 커밋 안 함)
+Brewfile.lock.json

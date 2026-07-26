@@ -1,10 +1,35 @@
 # Dotfiles
 
-한 줄이면 어디서든 동일한 셸 환경.
+한 줄이면 어디서든 동일한 셸 환경. macOS / Ubuntu·Debian 지원.
 
 ```bash
 git clone https://github.com/ljj727/dotfiles.git ~/dotfiles
 bash ~/dotfiles/install.sh
+```
+
+## 새 맥 세팅 (맥을 갈아탈 때)
+
+새 맥에는 Homebrew조차 없으므로 `install.sh`가 그것부터 깔고 `Brewfile`로 앱·도구를 일괄 복원한다.
+
+```bash
+xcode-select --install                                       # 1. CLT (git 필요)
+git clone https://github.com/ljj727/dotfiles.git ~/dotfiles  # 2. clone
+bash ~/dotfiles/install.sh                                   # 3. 나머지 전부
+```
+
+순서대로 Homebrew → Brewfile(앱·CLI·npm 전역) → Nerd Font → symlink → Claude 설정 → 기본 셸 zsh 까지 진행된다.
+
+| 알아둘 것 | 내용 |
+|-----------|------|
+| 소요 시간 | Brewfile 전체 설치는 수십 분. GUI 앱(cask)이 대부분의 시간을 차지한다 |
+| 암호 입력 | Homebrew 설치와 일부 cask에서 sudo 암호를 물어본다 (완전 무인 진행은 불가) |
+| 업그레이드 안 함 | `--no-upgrade`로 **없는 것만** 설치. 기존 패키지를 멋대로 업그레이드하지 않는다 |
+| 수동으로 남는 것 | App Store 앱, 로그인·자격증명, 은행 보안 플러그인, 시스템 설정 |
+
+**Brewfile 갱신** — 앱을 새로 깔거나 지운 뒤 현재 상태를 다시 덤프:
+
+```bash
+cd ~/dotfiles && brew bundle dump --force --file=Brewfile
 ```
 
 ## 구조
@@ -12,6 +37,7 @@ bash ~/dotfiles/install.sh
 ```
 ~/dotfiles/
 ├── install.sh                  # bootstrap (이것만 실행)
+├── Brewfile                    # macOS 앱·CLI·npm 전역 패키지 목록 (brew bundle)
 ├── zsh/.zshrc                  # portable zshrc (zinit + plugins)
 ├── starship/starship.toml      # 프롬프트 테마
 ├── tmux/.tmux.conf             # tmux 설정 (catppuccin)
@@ -20,7 +46,7 @@ bash ~/dotfiles/install.sh
 ├── wezterm/                    # WezTerm 터미널 (Mac only)
 ├── yazi/yazi.toml              # yazi 파일 매니저
 ├── superfile/config.toml       # superfile 파일 매니저
-├── claude/                     # Claude Code 설정 (settings + SuperClaude)
+├── claude/                     # Claude Code 설정 (자세히는 claude/README.md)
 │   └── install.sh              #   → ~/.claude 로 복사 (로컬 전용 파일 보존)
 └── local/.zshrc.local.example  # 머신별 설정 예시
 ```
@@ -30,8 +56,10 @@ bash ~/dotfiles/install.sh
 | 단계 | 내용 |
 |------|------|
 | OS 감지 | Ubuntu/Debian/macOS 자동 감지 |
-| apt 패키지 | zsh, git, curl, wget, unzip, xclip |
-| CLI 도구 | eza, fd, bat, fzf, zoxide, starship, nvm, superfile, yazi |
+| apt 패키지 | zsh, git, curl, wget, unzip, xclip (Debian) |
+| Homebrew | 없으면 설치 (macOS) |
+| Brewfile | 앱·CLI·npm 전역 일괄 설치 (macOS, `--no-upgrade`) |
+| CLI 도구 | eza, fd, bat, jq, fzf, zoxide, starship, nvm, superfile, yazi (Debian) |
 | Nerd Font | JetBrainsMono |
 | Symlink | .zshrc, starship.toml, yazi, superfile, tmux (+ wezterm on Mac) |
 | Claude 설정 | `claude/install.sh` 호출 → `~/.claude` 로 복사 |
@@ -52,12 +80,21 @@ bash ~/dotfiles/claude/install.sh
 |---------|------------------------------|
 | `settings.json` (플러그인·마켓플레이스 선언) | `.credentials.json` (OAuth/키) |
 | `CLAUDE.md` (개인 전역 지침) | `settings.local.json` (머신별 권한) |
-| | `sessions/` · `history.jsonl` · `cache/` |
-| | `plugins/` · `projects/` · `shell-snapshots/` |
+| `statusline.sh` · `keybindings.json` · `themes/` | `sessions/` · `history.jsonl` · `cache/` |
+| `commands/` · `agents/` · `skills/` | `plugins/` · `projects/` · `shell-snapshots/` |
+
+**외형·조작 설정** (자세히는 `claude/README.md`)
+
+| 항목 | 파일 | 내용 |
+|------|------|------|
+| 테마 | `themes/catppuccin-mocha.json` | WezTerm과 같은 Catppuccin Mocha 팔레트 |
+| 상태줄 | `statusline.sh` | 모델 · 컨텍스트 게이지 · git 브랜치 · 사용량 · 경로 (`jq` 필요) |
+| 키맵 | `keybindings.json` | transcript 뷰(`Ctrl+O`) 반페이지 스크롤 `u`/`d` |
+| 알림음 | `settings.json` 의 hook | 응답 완료 시 Glass 사운드 (macOS 전용, 그 외엔 무해하게 무시) |
 
 **동작 방식**
 - **복사(copy)** 방식 — 기존 파일은 `~/.claude/.dotfiles-backup.<timestamp>/` 로 백업 후 덮어씀.
-- 내용이 같으면 스킵 (멱등성).
+- 내용이 같으면 스킵 (멱등성). JSON은 Claude Code가 키 순서를 바꿔 다시 쓰므로 **정규화 후 비교**한다.
 - **플러그인은 선언적으로 관리**: `plugins/` 캐시(절대경로·stale 상태)는 커밋하지 않고,
   `settings.json` 의 `enabledPlugins`/마켓플레이스만 공유 → 첫 `claude` 실행 시 자동 재설치.
 - 로그인은 머신마다 `claude` 실행 후 직접 인증.
