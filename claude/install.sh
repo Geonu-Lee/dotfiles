@@ -79,8 +79,8 @@ PY
 }
 
 # 공유 대상 (이 목록만 배포 — 나머지 ~/.claude 항목은 로컬 전용으로 보존)
-TOP_FILES=(settings.json CLAUDE.md)
-SUB_DIRS=(commands agents skills)
+TOP_FILES=(settings.json CLAUDE.md keybindings.json statusline.sh)
+SUB_DIRS=(commands agents skills themes)
 
 echo ""
 echo -e "${BLUE}╔══════════════════════════════════════╗${NC}"
@@ -105,13 +105,24 @@ do_cp() {  # src dst — dry-run이면 실제 복사 생략
   mkdir -p "$(dirname "$2")"; cp "$1" "$2"
 }
 
+# 내용 동일 판정. JSON은 Claude Code가 키 순서를 바꿔 다시 쓰므로
+# 바이트 비교만으로는 매번 "변경됨"으로 오판된다 → 정규화해서 비교.
+same_file() {
+  local a="$1" b="$2" na nb
+  cmp -s "$a" "$b" && return 0
+  [[ "$a" == *.json ]] && command -v jq >/dev/null 2>&1 || return 1
+  na="$(jq -S . "$a" 2>/dev/null)" || return 1
+  nb="$(jq -S . "$b" 2>/dev/null)" || return 1
+  [[ -n "$na" && "$na" == "$nb" ]]
+}
+
 [[ "$DRY_RUN" == "1" ]] || mkdir -p "$DST"
 
 # --- 1. 최상위 파일 (settings.json, CLAUDE.md) ---
 for f in "${TOP_FILES[@]}"; do
   src="$SRC/$f"; dst="$DST/$f"
   [[ -f "$src" ]] || continue
-  if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
+  if [[ -f "$dst" ]] && same_file "$src" "$dst"; then
     skip "$f"
   elif [[ -f "$dst" ]]; then
     backup_file "$dst"; do_cp "$src" "$dst"; over "$f"
@@ -120,14 +131,19 @@ for f in "${TOP_FILES[@]}"; do
   fi
 done
 
-# --- 2. 디렉토리 merge (commands/, agents/, skills/) ---
+# statusline.sh 는 실행 권한이 없으면 상태줄이 조용히 표시되지 않는다
+if [[ "$DRY_RUN" != "1" && -f "$DST/statusline.sh" ]]; then
+  chmod +x "$DST/statusline.sh"
+fi
+
+# --- 2. 디렉토리 merge (commands/, agents/, skills/, themes/) ---
 # repo의 파일만 비교·복사한다. 대상에만 있는 로컬 파일은 손대지 않는다(보존).
 for d in ${SUB_DIRS[@]+"${SUB_DIRS[@]}"}; do
   src="$SRC/$d"
   [[ -d "$src" ]] || continue
   while IFS= read -r srcfile; do
     rel="${srcfile#$src/}"; tgt="$DST/$d/$rel"
-    if [[ -f "$tgt" ]] && cmp -s "$srcfile" "$tgt"; then
+    if [[ -f "$tgt" ]] && same_file "$srcfile" "$tgt"; then
       skip "$d/$rel"
     elif [[ -f "$tgt" ]]; then
       backup_file "$tgt"; do_cp "$srcfile" "$tgt"; over "$d/$rel"
