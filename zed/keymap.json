@@ -1,0 +1,228 @@
+// Zed 키맵 — 명령 팔레트 → "zed: open default keymap" 으로 기본값 확인 가능
+//
+// 설계 원칙
+//   - 패널 이동은 ctrl 계열, 패널 표시/숨김은 cmd 계열
+//   - vim 의 중요 키(ctrl-o/i 점프목록, ctrl-d/u 반페이지, ctrl-r 리두, ctrl-w)는 건드리지 않음
+//   - ctrl-e 는 vim 에서 "한 줄 스크롤"이지만 사이드바 전환용으로 양보
+[
+  {
+    // Workspace: 어디에 포커스가 있든 동작. 패널 안에서 다시 누르면 에디터로 복귀.
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-e": "project_panel::ToggleFocus",
+      "ctrl-g": "git_panel::ToggleFocus",
+      // ctrl-t: Claude(agent) 패널 — 오른쪽 dock
+      "ctrl-t": "agent::ToggleFocus",
+      // 터미널 토글. 한 번 shift-escape 로 확대해두면 그 뒤로는 전체 영역으로 열린다.
+      "ctrl-shift-t": "terminal_panel::Toggle",
+      // cmd-t: 새 터미널 (중앙 편집 영역에 탭으로, 전체 폭)
+      // 원래 project_symbols::Toggle 이었다 → cmd-shift-t 로 옮김
+      "cmd-t": "workspace::NewCenterTerminal",
+      "cmd-shift-t": "project_symbols::Toggle",
+      "cmd-shift-o": "outline_panel::ToggleFocus",
+      "cmd-shift-a": "agent::ToggleFocus",
+      // 프로젝트 전환기. tmuxinator 워크스페이스 선택(WezTerm ctrl-/)과 같은 자리.
+      // ctrl-/ 는 기본 키맵의 모든 컨텍스트에서 비어 있어 어디서든 동작한다.
+      // 선택기 안에서 cmd-shift-enter 를 누르면 교체가 아니라 현재 창에 추가된다.
+      // (스레드 사이드바는 Zed 기본 cmd-alt-j 로 남겨둠)
+      "ctrl-/": "projects::OpenRecent",
+      // 사이드바를 열지 않고 프로젝트(서버) 순환. 기본 바인딩이 없던 액션.
+      "cmd-shift-[": "multi_workspace::PreviousProject",
+      "cmd-shift-]": "multi_workspace::NextProject",
+
+      // 패널 표시/숨김
+      // cmd-j 는 tmux 손버릇(창 아래로 이동)에 양보 → 터미널은 ctrl-shift-t
+      "cmd-b": "workspace::ToggleLeftDock",
+      "cmd-alt-b": "workspace::ToggleRightDock",
+
+      // ── tmux 손버릇 이식 ──────────────────────────────
+      // Ctrl 계열 = 선택기 (tmux 의 ctrl-\ ssh선택 / ctrl-/ 워크스페이스선택 대응)
+      "ctrl-\\": "projects::OpenRemote",
+
+      // 창 크기 조절 (tmux: prefix + , . - =)
+      "ctrl-shift-left": "vim::ResizePaneLeft",
+      "ctrl-shift-right": "vim::ResizePaneRight",
+      "ctrl-shift-up": "vim::ResizePaneUp",
+      "ctrl-shift-down": "vim::ResizePaneDown",
+
+      // 창 이동 — hjkl (방향키와 병행). cmd-h 는 macOS 가 "가리기"로 선점해 안 먹는다.
+      "cmd-h": "workspace::ActivatePaneLeft",
+      "cmd-j": "workspace::ActivatePaneDown",
+      "cmd-k": "workspace::ActivatePaneUp",
+      "cmd-l": "workspace::ActivatePaneRight",
+
+      // 새 분할 만들기 (오른쪽에 나란히)
+      // 기본값은 project_panel::ToggleFocus / pane::RevealInProjectPanel 이었다.
+      // 파일트리 포커스는 ctrl-e 로 이미 되므로 분할에 양보.
+      "ctrl-shift-e": "pane::SplitRight",
+      "cmd-shift-e": "pane::SplitRight",
+
+      // cmd-1~9: 열려있는 탭으로 이동.
+      // 기본값은 ["workspace::ActivatePane", N] 이라 없는 분할창을 만들어버렸다.
+      "cmd-1": ["pane::ActivateItem", 0],
+      "cmd-2": ["pane::ActivateItem", 1],
+      "cmd-3": ["pane::ActivateItem", 2],
+      "cmd-4": ["pane::ActivateItem", 3],
+      "cmd-5": ["pane::ActivateItem", 4],
+      "cmd-6": ["pane::ActivateItem", 5],
+      "cmd-7": ["pane::ActivateItem", 6],
+      "cmd-8": ["pane::ActivateItem", 7],
+      "cmd-9": "pane::ActivateLastItem",
+
+      // 분할 창 이동
+      "cmd-left": "workspace::ActivatePaneLeft",
+      "cmd-right": "workspace::ActivatePaneRight",
+      "cmd-up": "workspace::ActivatePaneUp",
+      "cmd-down": "workspace::ActivatePaneDown"
+    }
+  },
+  {
+    // Editor 컨텍스트가 Workspace 보다 우선하므로 여기에도 명시해야
+    // vim 의 기본 ctrl-e(스크롤)를 확실히 덮어쓴다.
+    "context": "Editor",
+    "bindings": {
+      "ctrl-e": "project_panel::ToggleFocus",
+      "ctrl-t": "agent::ToggleFocus",
+      "ctrl-shift-t": "terminal_panel::Toggle",
+      "ctrl-/": "projects::OpenRecent",
+      "cmd-shift-[": "multi_workspace::PreviousProject",
+      "cmd-shift-]": "multi_workspace::NextProject",
+      "cmd-t": "workspace::NewCenterTerminal",
+      // 기본 키맵이 Editor/Pane 컨텍스트에서 shift-e 를 선점하므로 여기서 덮어쓴다
+      "ctrl-shift-e": "pane::SplitRight",
+      "cmd-shift-e": "pane::SplitRight",
+      // Editor 가 Workspace 보다 우선하므로 탭 이동도 여기 다시 명시
+      "cmd-1": ["pane::ActivateItem", 0],
+      "cmd-2": ["pane::ActivateItem", 1],
+      "cmd-3": ["pane::ActivateItem", 2],
+      "cmd-4": ["pane::ActivateItem", 3],
+      "cmd-5": ["pane::ActivateItem", 4],
+      "cmd-6": ["pane::ActivateItem", 5],
+      "cmd-7": ["pane::ActivateItem", 6],
+      "cmd-8": ["pane::ActivateItem", 7],
+      "cmd-9": "pane::ActivateLastItem",
+      // 분할 창 이동 (기본값 줄끝/파일끝 이동을 덮어씀)
+      "cmd-left": "workspace::ActivatePaneLeft",
+      "cmd-right": "workspace::ActivatePaneRight",
+      "cmd-up": "workspace::ActivatePaneUp",
+      "cmd-down": "workspace::ActivatePaneDown",
+      // hjkl 도 동일 (기본 cmd-l=줄선택 을 덮어씀)
+      "cmd-h": "workspace::ActivatePaneLeft",
+      "cmd-j": "workspace::ActivatePaneDown",
+      "cmd-k": "workspace::ActivatePaneUp",
+      "cmd-l": "workspace::ActivatePaneRight"
+    }
+  },
+  {
+    // vim normal 모드: 탭(버퍼) 이동을 H/L 로
+    "context": "Editor && vim_mode == normal",
+    "bindings": {
+      "shift-h": "pane::ActivatePreviousItem",
+      "shift-l": "pane::ActivateNextItem"
+    }
+  },
+  {
+    // vim 모드는 Editor 보다 깊은 컨텍스트를 쓰므로 여기에도 분할 이동을 명시.
+    // 이게 없으면 기본 cmd-left(줄 처음으로)가 이긴다.
+    "context": "Editor && VimControl",
+    "bindings": {
+      "cmd-left": "workspace::ActivatePaneLeft",
+      "cmd-right": "workspace::ActivatePaneRight",
+      "cmd-up": "workspace::ActivatePaneUp",
+      "cmd-down": "workspace::ActivatePaneDown",
+      "cmd-h": "workspace::ActivatePaneLeft",
+      "cmd-j": "workspace::ActivatePaneDown",
+      "cmd-k": "workspace::ActivatePaneUp",
+      "cmd-l": "workspace::ActivatePaneRight"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == insert",
+    "bindings": {
+      "cmd-left": "workspace::ActivatePaneLeft",
+      "cmd-right": "workspace::ActivatePaneRight",
+      "cmd-up": "workspace::ActivatePaneUp",
+      "cmd-down": "workspace::ActivatePaneDown"
+    }
+  },
+  {
+    // 모달 선택기(프로젝트·파일·원격 등)에서 목록 이동을 vim 식으로.
+    // 기본은 ctrl-n/ctrl-p 와 방향키뿐이라 ctrl-j/k 를 추가한다.
+    // vim 쪽은 "VimControl && !menu" 라 menu 컨텍스트에선 애초에 비켜준다.
+    "context": "menu",
+    "bindings": {
+      "ctrl-j": "menu::SelectNext",
+      "ctrl-k": "menu::SelectPrevious"
+    }
+  },
+  {
+    // 입력창이 있는 선택기(프로젝트 전환기 등)는 포커스가 Picker 안 Editor 에 있다
+    "context": "Picker > Editor",
+    "bindings": {
+      "ctrl-j": "menu::SelectNext",
+      "ctrl-k": "menu::SelectPrevious"
+    }
+  },
+  {
+    // 파일 트리에서 esc 로 에디터 복귀
+    "context": "ProjectPanel",
+    "bindings": {
+      "escape": "project_panel::ToggleFocus"
+    }
+  },
+  {
+    // 터미널 안에서는 Zed 가 키를 가로채지 않고 그대로 흘려보낸다.
+    // Claude Code 등 TUI 가 ctrl-e / ctrl-g 를 직접 받아야 하기 때문.
+    // ctrl-t 는 예외 — 터미널 안에서도 눌러서 닫아야 하므로 Zed 가 잡는다.
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-e": null,
+      "ctrl-g": null,
+      // 기본값은 셸로 ctrl-a/ctrl-e 전송, 스크롤. 창 이동에 양보.
+      // 셸에서 줄 처음/끝은 ctrl-a / ctrl-e 를 직접 누르면 된다.
+      "cmd-left": "workspace::ActivatePaneLeft",
+      "cmd-right": "workspace::ActivatePaneRight",
+      "cmd-up": "workspace::ActivatePaneUp",
+      "cmd-down": "workspace::ActivatePaneDown"
+    }
+  },
+
+  // ── Cmd+방향키를 "어떤 상황에서든" 창 이동으로 ──────────────
+  // 아래 컨텍스트들이 각자 Cmd+방향키를 기본 점유하고 있어 개별로 덮어써야 한다.
+  {
+    // 기본값: 전체 접기/펴기
+    "context": "ProjectPanel",
+    "bindings": {
+      "cmd-left": "workspace::ActivatePaneLeft",
+      "cmd-right": "workspace::ActivatePaneRight",
+      "cmd-up": "workspace::ActivatePaneUp",
+      "cmd-down": "workspace::ActivatePaneDown"
+    }
+  },
+  {
+    // 기본값: excerpt 단위 이동
+    "context": "Editor && multibuffer",
+    "bindings": {
+      "cmd-left": "workspace::ActivatePaneLeft",
+      "cmd-right": "workspace::ActivatePaneRight",
+      "cmd-up": "workspace::ActivatePaneUp",
+      "cmd-down": "workspace::ActivatePaneDown"
+    }
+  },
+  {
+    // 기본값: 첫/마지막 변경사항으로 이동
+    "context": "GitPanel && ChangesList && !GitBranchSelector && !GitRepositorySelector",
+    "bindings": {
+      "cmd-up": "workspace::ActivatePaneUp",
+      "cmd-down": "workspace::ActivatePaneDown"
+    }
+  },
+  {
+    // 기본값: 문서 처음/끝으로 스크롤
+    "context": "MarkdownPreview",
+    "bindings": {
+      "cmd-up": "workspace::ActivatePaneUp",
+      "cmd-down": "workspace::ActivatePaneDown"
+    }
+  }
+]
