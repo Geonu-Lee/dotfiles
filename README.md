@@ -1,6 +1,15 @@
 # Dotfiles
 
-한 줄이면 어디서든 동일한 셸 환경. macOS / Ubuntu·Debian 지원.
+한 줄이면 어디서든 동일한 셸 환경.
+
+| 플랫폼 | 상태 |
+|--------|------|
+| macOS | 주 사용 환경. 실제로 검증됨 |
+| Ubuntu / Debian | 지원. **아직 실기 검증은 안 됨** |
+| Windows | 미지원 — WSL2 안에서 Ubuntu 경로로 동작 |
+
+Debian 계열에서는 neovim 을 apt 대신 공식 릴리스로 설치한다 (apt 버전이 LazyVim 요구치 0.9 미만인 경우가 많음).
+Zed·Finder 연동·Brewfile 은 macOS 전용이라 자동으로 건너뛴다.
 
 ```bash
 git clone https://github.com/ljj727/dotfiles.git ~/dotfiles
@@ -138,11 +147,11 @@ bash macos/set-default-apps.sh local.openinterminal # → WezTerm 새 창의 nvi
 | 단계 | 내용 |
 |------|------|
 | OS 감지 | Ubuntu/Debian/macOS 자동 감지 |
-| apt 패키지 | zsh, git, curl, wget, unzip, xclip (Debian) |
+| apt 패키지 | zsh, git, curl, wget, unzip, xclip, build-essential, ripgrep, tmux, ruby (Debian) |
 | Homebrew | 없으면 설치 (macOS) |
 | Brewfile | 앱·CLI·npm 전역 일괄 설치 (macOS, `--no-upgrade`) |
-| CLI 도구 | eza, fd, bat, jq, fzf, zoxide, starship, nvm, yazi (Debian) |
-| Nerd Font | JetBrainsMono |
+| CLI 도구 | eza, fd, bat, jq, fzf, zoxide, starship, nvm, yazi, neovim, tmuxinator |
+| Nerd Font | JetBrainsMono (Debian 전용 — mac 은 Brewfile cask) |
 | Symlink | .zshrc, starship, yazi, tmux, nvim (+ wezterm·zed on Mac) |
 | Finder 연동 | 기본 앱 지정 + `.app` 래퍼 빌드 (macOS) |
 | Claude 설정 | `claude/install.sh` 호출 → `~/.claude` 로 복사 |

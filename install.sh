@@ -18,6 +18,7 @@ NC='\033[0m'
 info()  { echo -e "${BLUE}→${NC} $*"; }
 ok()    { echo -e "${GREEN}✓${NC} $*"; }
 skip()  { echo -e "${YELLOW}⊘${NC} $*  (이미 설치됨)"; }
+warn()  { echo -e "${YELLOW}!${NC} $*"; }
 err()   { echo -e "${RED}✗${NC} $*"; exit 1; }
 
 # ============================================================================
@@ -74,7 +75,10 @@ backup_and_link() {
 if [[ "$OS" == "debian" ]]; then
     info "apt 패키지 설치..."
     sudo apt-get update -qq
-    sudo apt-get install -y -qq zsh git curl wget unzip xclip fontconfig > /dev/null 2>&1
+    # build-essential: nvim treesitter 컴파일 / ripgrep: LazyVim 검색 / ruby: tmuxinator
+    sudo apt-get install -y -qq \
+        zsh git curl wget unzip xclip fontconfig \
+        build-essential ripgrep tmux ruby-full > /dev/null 2>&1
     ok "기본 패키지"
 fi
 
@@ -100,8 +104,14 @@ if [[ "$OS" == "mac" ]]; then
 
     if [[ -f "$DOTFILES/Brewfile" ]]; then
         info "Brewfile 적용 (앱·CLI 도구 일괄 설치, 시간이 오래 걸릴 수 있음)..."
-        brew bundle install --file="$DOTFILES/Brewfile" --no-upgrade
-        ok "Brewfile"
+        # 실패해도 중단하지 않는다. cask 하나(예: 신뢰되지 않은 서드파티 tap) 때문에
+        # symlink·nvim·Claude 설정까지 통째로 건너뛰는 게 훨씬 손해다.
+        if brew bundle install --file="$DOTFILES/Brewfile" --no-upgrade; then
+            ok "Brewfile"
+        else
+            warn "Brewfile 일부 실패 — 위 메시지 확인. 나머지 설치는 계속합니다."
+            warn "  'untrusted tap' 오류라면:  brew trust <tap 이름>  후 재실행"
+        fi
     fi
 fi
 
@@ -221,22 +231,70 @@ else
     ok "yazi"
 fi
 
-# ============================================================================
-# 3. Nerd Font
-# ============================================================================
-echo ""
-FONT_DIR="$HOME/.local/share/fonts"
-if fc-list 2>/dev/null | grep -qi "JetBrainsMono\|FiraCode"; then
-    skip "Nerd Font"
+# --- neovim ---
+# Debian apt 의 neovim 은 LazyVim 요구치(0.9+)보다 낮은 경우가 많아 공식 릴리스를 쓴다.
+nvim_version_ok() {
+    command -v nvim &> /dev/null || return 1
+    local major minor
+    read -r major minor < <(nvim --version | head -1 | sed -E 's/^NVIM v([0-9]+)\.([0-9]+).*/\1 \2/')
+    [[ "${major:-0}" -gt 0 || "${minor:-0}" -ge 9 ]]
+}
+
+if nvim_version_ok; then
+    skip "neovim ($(nvim --version | head -1 | awk '{print $2}'))"
 else
-    info "JetBrainsMono Nerd Font 설치..."
-    mkdir -p "$FONT_DIR"
-    wget -qO /tmp/JetBrainsMono.zip \
-        "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"
-    unzip -oq /tmp/JetBrainsMono.zip -d "$FONT_DIR"
-    rm -f /tmp/JetBrainsMono.zip
-    fc-cache -f "$FONT_DIR"
-    ok "JetBrainsMono Nerd Font"
+    if [[ "$OS" == "debian" ]]; then
+        case "$(uname -m)" in
+            x86_64)        NVIM_ASSET="nvim-linux-x86_64" ;;
+            aarch64|arm64) NVIM_ASSET="nvim-linux-arm64" ;;
+            *)             err "neovim: 지원하지 않는 아키텍처 $(uname -m)" ;;
+        esac
+        curl -sSfLo /tmp/nvim.tar.gz \
+            "https://github.com/neovim/neovim/releases/latest/download/${NVIM_ASSET}.tar.gz"
+        sudo rm -rf "/opt/$NVIM_ASSET"
+        sudo tar -C /opt -xzf /tmp/nvim.tar.gz
+        sudo ln -sf "/opt/$NVIM_ASSET/bin/nvim" /usr/local/bin/nvim
+        rm -f /tmp/nvim.tar.gz
+    elif [[ "$OS" == "mac" ]]; then
+        brew install neovim
+    fi
+    ok "neovim"
+fi
+
+# --- tmuxinator (tmux 자체는 Debian apt / mac Brewfile 에서 설치됨) ---
+if command -v tmuxinator &> /dev/null; then
+    skip "tmuxinator"
+else
+    if [[ "$OS" == "debian" ]]; then
+        gem install --user-install --no-document tmuxinator > /dev/null 2>&1
+        # .zshrc 의 PATH 에 이미 ~/.local/bin 이 있으므로 거기로 링크
+        mkdir -p "$HOME/.local/bin"
+        GEM_BIN="$(ruby -e 'require "rubygems"; print Gem.user_dir' 2>/dev/null)/bin/tmuxinator"
+        [[ -x "$GEM_BIN" ]] && ln -sf "$GEM_BIN" "$HOME/.local/bin/tmuxinator"
+    elif [[ "$OS" == "mac" ]]; then
+        brew install tmuxinator
+    fi
+    ok "tmuxinator"
+fi
+
+# ============================================================================
+# 3. Nerd Font (Debian 전용 — mac 은 Brewfile 의 cask 폰트로 설치된다)
+# ============================================================================
+if [[ "$OS" == "debian" ]]; then
+    echo ""
+    FONT_DIR="$HOME/.local/share/fonts"
+    if fc-list 2>/dev/null | grep -qi "JetBrainsMono\|FiraCode"; then
+        skip "Nerd Font"
+    else
+        info "JetBrainsMono Nerd Font 설치..."
+        mkdir -p "$FONT_DIR"
+        wget -qO /tmp/JetBrainsMono.zip \
+            "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"
+        unzip -oq /tmp/JetBrainsMono.zip -d "$FONT_DIR"
+        rm -f /tmp/JetBrainsMono.zip
+        fc-cache -f "$FONT_DIR"
+        ok "JetBrainsMono Nerd Font"
+    fi
 fi
 
 # ============================================================================
