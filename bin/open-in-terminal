@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ============================================================================
+# Finder → nvim
+#   Finder에서 더블클릭한 파일을 WezTerm 새 창의 nvim 으로 연다.
+#   OpenInTerminal.app (AppleScript 래퍼) 이 이 스크립트를 호출한다.
+#
+#   사용법:  open-in-terminal <파일>
+#            open-in-terminal --no-file    파일 없이 셸만
+#
+#   특정 확장자를 다른 도구로 보내고 싶으면 (예: json → jless) 아래에
+#   case 분기를 넣으면 된다. 단 jless/glow 는 읽기 전용이라 편집이 안 된다.
+# ============================================================================
+
+BIN="/opt/homebrew/bin"
+[[ -d "$BIN" ]] || BIN="/usr/local/bin"
+
+file="${1:?열 파일 경로가 필요합니다 (또는 --no-file)}"
+
+if [[ "$file" == "--no-file" ]]; then
+    exec "$BIN/wezterm" start --always-new-process
+fi
+
+exec "$BIN/wezterm" start --always-new-process -- "$BIN/nvim" "$file"
