@@ -70,6 +70,8 @@ brew "grpcurl"
 brew "hadolint"
 # Get events and tasks from the macOS calendar database
 brew "ical-buddy"
+# Command-line pager for JSON data
+brew "jless"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
 # Simple terminal UI for git commands
@@ -198,6 +200,8 @@ cask "vlc"
 cask "wezterm"
 # Open-source version of the X.Org X Window System
 cask "xquartz"
+# Multiplayer code editor
+cask "zed"
 npm "@anthropic-ai/claude-code"
 npm "corepack"
 npm "pnpm"

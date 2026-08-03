@@ -92,6 +92,20 @@ function M.setup()
 		-- yazi 파일 매니저
 		{ key = "phys:f", mods = "CMD", action = wezterm.action.SendString("\x02" .. "f") },
 
+		-- termscp (새 tmux 윈도우에서 바로 실행)
+		{
+			key = "phys:T",
+			mods = "CMD|SHIFT",
+			action = wezterm.action_callback(function()
+				wezterm.background_child_process({
+					"/opt/homebrew/bin/tmux", "new-window", "/opt/homebrew/bin/termscp", "/Users/ijongjin/snuailab/project/",
+				})
+			end),
+		},
+
+		-- Quick Select: 화면의 경로/URL/해시 등을 라벨로 빠르게 복사
+		{ key = "phys:Space", mods = "CMD|SHIFT", action = wezterm.action.QuickSelect },
+
 		-- 세션 빠른 전환 (Ctrl+숫자)
 		{
 			key = "phys:1", mods = "CTRL",

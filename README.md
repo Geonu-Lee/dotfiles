@@ -44,12 +44,94 @@ cd ~/dotfiles && brew bundle dump --force --file=Brewfile
 ├── tmux/tmux.reset.conf        # tmux 키바인딩
 ├── tmux/scripts/               # tmux 헬퍼 스크립트
 ├── wezterm/                    # WezTerm 터미널 (Mac only)
+├── wezterm-windows/            # WezTerm Windows용 설정 (install.sh 대상 아님)
 ├── yazi/yazi.toml              # yazi 파일 매니저
-├── superfile/config.toml       # superfile 파일 매니저
+├── nvim/                       # Neovim (LazyVim). ~/.config/nvim 으로 심링크
+├── zed/                        # Zed 에디터 settings.json · keymap.json (Mac only)
+├── bin/open-in-terminal        # Finder에서 연 파일 → WezTerm + nvim 으로 열기
+├── macos/                      # macOS 전용 (Finder 기본 앱 지정, .app 래퍼)
 ├── claude/                     # Claude Code 설정 (자세히는 claude/README.md)
 │   └── install.sh              #   → ~/.claude 로 복사 (로컬 전용 파일 보존)
 └── local/.zshrc.local.example  # 머신별 설정 예시
 ```
+
+## Neovim (LazyVim)
+
+`nvim/` 을 `~/.config/nvim` 으로 **심링크**한다. `lazy-lock.json`(플러그인 버전 고정)과
+`lazyvim.json`(활성 extras)을 nvim이 직접 갱신하는데, 심링크여야 그 변경이 repo에 남는다.
+
+**활성화된 extras** — `:LazyExtras` 에서 켜고 끄면 `lazyvim.json` 에 기록된다.
+
+| extra | 얻는 것 |
+|-------|---------|
+| `lang.markdown` | render-markdown.nvim — 편집하면서 렌더링된 마크다운을 본다 (glow와 달리 편집 가능) |
+| `lang.json` | SchemaStore 연동 — 스키마 검증·자동완성 |
+| `lang.yaml` | 위와 동일 (yaml 스키마) |
+| `lang.toml` | toml LSP |
+| `lang.typescript` | ts/js/tsx LSP·포매터 |
+| `lang.python` | python LSP·venv 선택기 |
+
+새 머신에서는 첫 `nvim` 실행 시 lazy.nvim이 `lazy-lock.json` 버전 그대로 플러그인을 받고,
+Mason이 LSP·포매터를 설치한다. 헤드리스로 미리 받으려면:
+
+```bash
+nvim --headless "+Lazy! sync" +qa
+```
+
+## Zed (macOS)
+
+`zed/settings.json` · `zed/keymap.json` 을 `~/.config/zed/` 로 심링크한다.
+Zed 가 파일을 직접 갱신하므로 심링크여야 변경이 repo 에 남는다.
+
+**키맵 설계 원칙** — WezTerm + tmux 손버릇을 옮긴 것이라 새 바인딩도 이 체계를 따를 것.
+
+- `Ctrl` 계열 = 패널·선택기 / `Cmd` 계열 = 창·탭·분할 조작
+- 창 이동은 방향키와 `hjkl` 둘 다 열어둠
+
+| 키 | 동작 |
+|----|------|
+| `Ctrl+/` | 프로젝트 전환기 (선택기에서 `Cmd+Shift+Enter` = 현재 창에 추가) |
+| `Ctrl+\` | SSH 원격 프로젝트 |
+| `Ctrl+E` · `Ctrl+G` | 파일트리 · Git (왼쪽 dock) |
+| `Ctrl+T` · `Ctrl+Shift+T` | Claude · 터미널 |
+| `Cmd+방향키` / `Cmd+hjkl` | 분할 창 이동 |
+| `Ctrl+Shift+E` | 오른쪽으로 분할 |
+| `Cmd+1~9` | 탭 이동 |
+| `Ctrl+J` / `Ctrl+K` | 선택기 목록 이동 |
+
+**주의** — Zed 키맵은 **더 구체적인 컨텍스트가 이긴다.** `Workspace` 에만 넣으면
+`Editor`·`Terminal`·`ProjectPanel` 등이 같은 키를 기본 점유한 경우 밀린다.
+실제로 `Cmd+방향키` 는 8개 컨텍스트에 개별로 넣어야 어디서든 동작했다.
+
+액션명 확인: `strings /Applications/Zed.app/Contents/MacOS/zed | grep -F '<action>'`
+기본 키맵 원문: `gh api repos/zed-industries/zed/contents/assets/keymaps/default-macos.json --jq '.content' | base64 -d`
+
+## Finder 기본 앱 (macOS)
+
+`md`/`json`/`yaml`/소스코드 등 44개 확장자를 더블클릭했을 때 열릴 앱을 `duti` 로 지정한다.
+**현재 기본값은 Zed.**
+
+```bash
+bash macos/set-default-apps.sh                      # → Zed (기본)
+bash macos/set-default-apps.sh local.openinterminal # → WezTerm 새 창의 nvim
+```
+
+터미널로 여는 쪽을 고르면 `OpenInTerminal.app` 이 처리한다. Finder 가 CLI 를 직접 호출할 수 없어
+`.app` 래퍼가 필요하기 때문이다. macOS 기본 터미널 설정과 무관하게 항상 WezTerm 을 쓴다.
+
+**구성 요소**
+
+| 파일 | 역할 |
+|------|------|
+| `macos/set-default-apps.sh` | `duti` 로 확장자별 기본 앱 지정 (인자로 번들 ID 전달 가능) |
+| `bin/open-in-terminal` | WezTerm + nvim 으로 파일 열기 |
+| `macos/OpenInTerminal.applescript` | Finder 가 CLI 를 못 부르므로 필요한 `.app` 래퍼 소스 |
+| `macos/build-open-in-terminal.sh` | `~/Applications/OpenInTerminal.app` 빌드 (sudo 불필요) |
+
+**되돌리기** — `duti -s com.apple.TextEdit md all` 처럼 원하는 앱으로 다시 지정.
+
+**한계** — `toml`, `conf`, `go`, `rs`, `lua` 등 macOS가 모르는 확장자는 동적 UTI로 잡혀
+`duti` 자동 지정이 거부된다. Finder에서 한 번만 "정보 가져오기 → 다음으로 열기 → 모두 변경" 하면 된다.
 
 ## install.sh이 하는 일
 
@@ -59,9 +141,10 @@ cd ~/dotfiles && brew bundle dump --force --file=Brewfile
 | apt 패키지 | zsh, git, curl, wget, unzip, xclip (Debian) |
 | Homebrew | 없으면 설치 (macOS) |
 | Brewfile | 앱·CLI·npm 전역 일괄 설치 (macOS, `--no-upgrade`) |
-| CLI 도구 | eza, fd, bat, jq, fzf, zoxide, starship, nvm, superfile, yazi (Debian) |
+| CLI 도구 | eza, fd, bat, jq, fzf, zoxide, starship, nvm, yazi (Debian) |
 | Nerd Font | JetBrainsMono |
-| Symlink | .zshrc, starship.toml, yazi, superfile, tmux (+ wezterm on Mac) |
+| Symlink | .zshrc, starship, yazi, tmux, nvim (+ wezterm·zed on Mac) |
+| Finder 연동 | 기본 앱 지정 + `.app` 래퍼 빌드 (macOS) |
 | Claude 설정 | `claude/install.sh` 호출 → `~/.claude` 로 복사 |
 | 기본 셸 | zsh로 변경 |
 
@@ -152,7 +235,6 @@ export EDITOR=/opt/nvim-linux64/bin/nvim
 | 명령 | 설명 |
 |------|------|
 | `z <dir>` | zoxide (스마트 cd) |
-| `spf` | superfile (듀얼패널 파일 매니저) |
 | `yazi` | yazi (파일 매니저 + 이미지 프리뷰) |
 | `vf` | fzf로 파일 찾아서 nvim으로 열기 |
 | `cx <dir>` | cd + ls |

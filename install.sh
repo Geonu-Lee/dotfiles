@@ -204,14 +204,6 @@ else
     ok "nvm"
 fi
 
-# --- superfile ---
-if command -v spf &> /dev/null; then
-    skip "superfile"
-else
-    curl -sSL https://superfile.netlify.app/install.sh | bash
-    ok "superfile"
-fi
-
 # --- yazi ---
 if command -v yazi &> /dev/null; then
     skip "yazi"
@@ -256,16 +248,20 @@ info "Symlink 설정..."
 # zsh
 backup_and_link "$DOTFILES/zsh/.zshrc" "$HOME/.zshrc"
 
-# starship
-backup_and_link "$DOTFILES/starship/starship.toml" "$HOME/.config/starship.toml"
+# starship — .zshrc 의 STARSHIP_CONFIG 가 ~/.config/starship/starship.toml 을 가리킨다
+mkdir -p "$HOME/.config/starship"
+backup_and_link "$DOTFILES/starship/starship.toml" "$HOME/.config/starship/starship.toml"
 
 # yazi
 mkdir -p "$HOME/.config/yazi"
 backup_and_link "$DOTFILES/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
 
-# superfile
-mkdir -p "$HOME/.config/superfile"
-backup_and_link "$DOTFILES/superfile/config.toml" "$HOME/.config/superfile/config.toml"
+# zed (Mac only) — themes/ 등 나머지는 Zed 가 관리하므로 두 파일만 링크
+if [[ "$OS" == "mac" ]]; then
+    mkdir -p "$HOME/.config/zed"
+    backup_and_link "$DOTFILES/zed/settings.json" "$HOME/.config/zed/settings.json"
+    backup_and_link "$DOTFILES/zed/keymap.json" "$HOME/.config/zed/keymap.json"
+fi
 
 # tmux (Mac에서만 WezTerm과 함께 사용)
 backup_and_link "$DOTFILES/tmux/.tmux.conf" "$HOME/.tmux.conf"
@@ -274,6 +270,16 @@ backup_and_link "$DOTFILES/tmux/tmux.reset.conf" "$HOME/.config/tmux/tmux.reset.
 if [[ -d "$DOTFILES/tmux/scripts" ]]; then
     ln -sfn "$DOTFILES/tmux/scripts" "$HOME/.config/tmux/scripts"
 fi
+
+# nvim (LazyVim) — 디렉토리 통째로 심링크.
+# lazy-lock.json / lazyvim.json 은 nvim 이 직접 갱신하므로 링크여야 repo 에 반영된다.
+if [[ -e "$HOME/.config/nvim" && ! -L "$HOME/.config/nvim" ]]; then
+    mv "$HOME/.config/nvim" "$HOME/.config/nvim.bak.$(date +%Y%m%d%H%M%S)"
+    info "기존 ~/.config/nvim 백업"
+fi
+mkdir -p "$HOME/.config"
+ln -sfn "$DOTFILES/nvim" "$HOME/.config/nvim"
+ok "symlink ~/.config/nvim → $DOTFILES/nvim"
 
 # wezterm (Mac only)
 if [[ "$OS" == "mac" ]]; then
@@ -291,6 +297,17 @@ if [[ ! -f "$HOME/.zshrc.local" ]]; then
     ok "~/.zshrc.local 생성됨 — 머신에 맞게 수정하세요"
 else
     skip "~/.zshrc.local"
+fi
+
+# ============================================================================
+# 5.3 Finder 기본 앱 → 터미널 (macOS)
+#     md/json/yaml/소스코드를 더블클릭하면 WezTerm 새 창의 nvim/jless/glow 로 열린다.
+# ============================================================================
+if [[ "$OS" == "mac" && -f "$DOTFILES/macos/build-open-in-terminal.sh" ]]; then
+    echo ""
+    info "Finder → 터미널 연동..."
+    bash "$DOTFILES/macos/build-open-in-terminal.sh"
+    bash "$DOTFILES/macos/set-default-apps.sh"
 fi
 
 # ============================================================================
@@ -330,6 +347,5 @@ echo "  3. 터미널 폰트 → JetBrainsMono Nerd Font"
 echo ""
 echo "  주요 도구:"
 echo "  z <dir>   zoxide (스마트 cd)"
-echo "  spf       superfile (파일 매니저)"
 echo "  yazi      yazi (파일 매니저)"
 echo ""
