@@ -1,9 +1,140 @@
--- VSCode에서 실행 중인지 확인
-if vim.g.vscode then
-  -- VSCode 전용 설정만 로드
-  require("vscode-config")
-else
-  -- 기존 LazyVim 설정 로드
-  -- bootstrap lazy.nvim, LazyVim and your plugins
-  require("config.lazy")
+-- ============================================================================
+-- Neovim — 직접 구성 (kickstart 방식)
+--
+-- 원칙
+--   · 모든 줄을 이해한 상태를 유지한다. 이해 못 하는 설정은 넣지 않는다
+--   · LSP·자동완성은 넣지 않았다. 코드 인텔리전스는 Claude Code 가 담당하고
+--     nvim 은 편집·열람에 집중한다. 필요해지면 이 파일에 추가하면 된다
+--   · 플러그인 목표: 15개 이하
+--
+-- 이전 상태(LazyVim)로 되돌리려면:
+--   cd ~/dotfiles && git checkout nvim-lazyvim-final -- nvim/
+-- ============================================================================
+
+-- leader 는 플러그인 로드 전에 정해야 한다 (플러그인이 이걸 기준으로 키를 잡음)
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
+
+-- ── 기본 동작 ───────────────────────────────────────────────────────────────
+local opt = vim.opt
+
+opt.number = true
+opt.relativenumber = true -- 상대 줄번호 — 10j 같은 이동에 유용
+opt.signcolumn = "yes" -- git 표시가 들락날락하며 화면이 흔들리는 것 방지
+opt.cursorline = true
+opt.scrolloff = 8 -- 커서 위아래로 최소 8줄 남김
+opt.sidescrolloff = 8
+opt.wrap = false
+
+opt.expandtab = true -- 탭 대신 스페이스
+opt.tabstop = 2
+opt.shiftwidth = 2
+opt.smartindent = true
+
+opt.ignorecase = true -- 검색은 대소문자 무시
+opt.smartcase = true --   단 대문자를 쓰면 구분
+opt.hlsearch = false -- 검색 후 하이라이트가 계속 남지 않게
+opt.incsearch = true
+
+opt.splitright = true -- 새 분할은 오른쪽·아래로 (tmux 습관과 일치)
+opt.splitbelow = true
+
+opt.undofile = true -- nvim 을 닫아도 undo 이력 유지
+opt.swapfile = false
+opt.backup = false
+
+opt.termguicolors = true -- 24bit 색 (Ghostty 가 RGB 지원)
+opt.updatetime = 250 -- 진단·gitsigns 반응 속도
+opt.timeoutlen = 400 -- 키 조합 대기 시간
+opt.mouse = "a"
+opt.clipboard = "unnamedplus" -- 시스템 클립보드 공유
+opt.confirm = true -- 저장 안 한 버퍼를 닫을 때 물어봄
+
+-- ── 키맵 ────────────────────────────────────────────────────────────────────
+local map = vim.keymap.set
+
+-- insert 모드에서 jk 로 빠져나오기 (기존 손버릇)
+map("i", "jk", "<Esc>", { desc = "Esc" })
+
+-- 검색 하이라이트 지우기
+map("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "하이라이트 해제" })
+
+-- 창 이동 — tmux 의 prefix+hjkl 과 같은 감각
+map("n", "<C-h>", "<C-w>h", { desc = "왼쪽 창" })
+map("n", "<C-j>", "<C-w>j", { desc = "아래 창" })
+map("n", "<C-k>", "<C-w>k", { desc = "위 창" })
+map("n", "<C-l>", "<C-w>l", { desc = "오른쪽 창" })
+
+-- 버퍼 이동 — S-h/S-l 과 [b/]b 둘 다.
+-- [ ] 접두사는 vim 관례(unimpaired 스타일)이고 ]h(git hunk)와 결이 맞는다.
+map("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "이전 버퍼" })
+map("n", "<S-l>", "<cmd>bnext<CR>", { desc = "다음 버퍼" })
+map("n", "[b", "<cmd>bprevious<CR>", { desc = "이전 버퍼" })
+map("n", "]b", "<cmd>bnext<CR>", { desc = "다음 버퍼" })
+
+-- quickfix 항목 이동 (grug-far 로 전역 치환할 때 결과를 훑는 데 쓴다)
+map("n", "[q", "<cmd>cprevious<CR>", { desc = "이전 quickfix" })
+map("n", "]q", "<cmd>cnext<CR>", { desc = "다음 quickfix" })
+map("n", "<leader>xq", "<cmd>copen<CR>", { desc = "quickfix 열기" })
+
+-- 버퍼 정리
+map("n", "<leader>bo", "<cmd>%bdelete|edit#|bdelete#<CR>", { desc = "다른 버퍼 모두 닫기" })
+
+-- 시각 모드에서 들여쓰기 후에도 선택 유지
+map("v", "<", "<gv")
+map("v", ">", ">gv")
+
+-- 선택 영역 위아래로 이동
+map("v", "J", ":m '>+1<CR>gv=gv", { desc = "아래로 이동" })
+map("v", "K", ":m '<-2<CR>gv=gv", { desc = "위로 이동" })
+
+-- 저장·종료
+map("n", "<leader>w", "<cmd>write<CR>", { desc = "저장" })
+map("n", "<leader>q", "<cmd>quit<CR>", { desc = "닫기" })
+
+-- ── 자동 명령 ───────────────────────────────────────────────────────────────
+-- yank 한 영역을 잠깐 하이라이트 (뭘 복사했는지 눈으로 확인)
+vim.api.nvim_create_autocmd("TextYankPost", {
+  desc = "yank 하이라이트",
+  callback = function()
+    vim.hl.on_yank()
+  end,
+})
+
+-- 글을 쓰는 파일에서는 코드와 다른 설정이 필요하다.
+-- wrap=false 는 코드에는 맞지만 문장이 화면 밖으로 잘려 글에는 못 쓴다.
+vim.api.nvim_create_autocmd("FileType", {
+  desc = "문서 파일은 줄바꿈·맞춤법 켜기",
+  pattern = { "markdown", "text", "gitcommit" },
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true -- 단어 중간에서 끊지 않고 어절 단위로 감싼다
+    vim.opt_local.breakindent = true -- 감긴 줄도 들여쓰기 유지 (목록이 안 깨짐)
+    vim.opt_local.spell = true
+    vim.opt_local.spelllang = "en_us" -- 한글은 사전이 없어 영어만 검사
+    -- 감긴 줄에서도 j/k 가 "보이는 한 줄" 단위로 움직이게
+    vim.keymap.set({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, buffer = true })
+    vim.keymap.set({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, buffer = true })
+  end,
+})
+
+-- ── 플러그인 매니저 (lazy.nvim) ─────────────────────────────────────────────
+-- LazyVim(배포판)과 lazy.nvim(매니저)은 별개다. 매니저만 쓴다.
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local out = vim.fn.system({
+    "git", "clone", "--filter=blob:none", "--branch=stable",
+    "https://github.com/folke/lazy.nvim.git", lazypath,
+  })
+  if vim.v.shell_error ~= 0 then
+    error("lazy.nvim 설치 실패:\n" .. out)
+  end
 end
+vim.opt.rtp:prepend(lazypath)
+
+require("lazy").setup({
+  spec = { { import = "plugins" } },
+  install = { colorscheme = { "habamax" } },
+  checker = { enabled = false }, -- 업데이트 자동 확인 끔
+  change_detection = { notify = false },
+})

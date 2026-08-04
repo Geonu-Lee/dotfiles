@@ -25,6 +25,12 @@ font-family = Apple Color Emoji
 # WezTerm 설정에 있던 "Symbols Nerd Font" 는 이 머신에 미설치라 뺐다.
 # FiraCode Nerd Font 가 이미 Nerd 글리프를 포함하므로 실질 손실 없음.
 font-size = 15
+# Retina 에서 글자가 얇게 보이는 것 보정
+font-thicken = true
+# 행간 — 가독성·인상 차이가 가장 큰 값. 0% 가 기본
+adjust-cell-height = 12%
+# 타이틀바 폰트도 지정 가능 (WezTerm 에는 없던 옵션)
+window-title-font-family = FiraCode Nerd Font
 
 # 한글은 D2Coding 으로 (코드포인트 범위 지정 — WezTerm 보다 정밀함)
 font-codepoint-map = U+AC00-U+D7A3,U+1100-U+11FF,U+3130-U+318F=D2CodingLigature Nerd Font
@@ -56,12 +62,39 @@ palette = 14=#a4ffff
 palette = 15=#ffffff
 
 # ── 윈도우 ────────────────────────────────────────────────
-# WezTerm: window_decorations="RESIZE", padding 4, opacity 1.00, tab_bar 숨김
-macos-titlebar-style = hidden
+# WezTerm 은 window_decorations="RESIZE" 로 타이틀바를 완전히 없앴지만,
+# Ghostty 는 타이틀바 색까지 지정할 수 있어 남겨두는 편이 낫다.
+#   native / transparent / tabs / hidden 중 선택
+#   - transparent: 배경과 어우러짐 (탭을 tmux 로 쓰므로 이게 맞음)
+#   - tabs: 탭이 타이틀바에 통합 (Safari 스타일) — Ghostty 탭을 쓸 때
+#   - hidden: 완전히 없음 (WezTerm 과 동일하게 하려면 이것)
+macos-titlebar-style = transparent
+
+# 타이틀바를 Dracula 팔레트에 맞춤 (WezTerm 에는 없던 기능)
+window-titlebar-background = #21222c
+window-titlebar-foreground = #6272a4
+
 window-padding-x = 4
 window-padding-y = 4
-background-opacity = 1
+window-padding-balance = true
 window-inherit-working-directory = true
+
+# 리사이즈 시 패딩도 배경색으로 채워 빈틈이 안 보이게
+window-padding-color = extend
+
+# 넓은 색역 — 2560x1600 디스플레이에서 Dracula 색이 더 정확하게 나온다
+window-colorspace = display-p3
+
+# ── 반투명 · 블러 (WezTerm 에는 블러가 아예 없다) ─────────
+background-opacity = 0.95
+background-blur = 20
+
+# ── 앱 아이콘 (Dock·Cmd+Tab 에 보이는 것) ─────────────────
+# official / blueprint / chalkboard / microchip / glass / holographic
+#   / paper / retro / xray
+# frame: aluminum / beige / plastic / chrome
+macos-icon = retro
+macos-icon-frame = aluminum
 
 # ── 동작 ──────────────────────────────────────────────────
 macos-option-as-alt = true
@@ -77,6 +110,11 @@ confirm-close-surface = false
 # ══════════════════════════════════════════════════════════
 # WezTerm 의 disable_default_key_bindings = true 에 해당
 keybind = clear
+
+# ── Quick Terminal — 화면 위에서 내려오는 드롭다운 터미널 ─
+# WezTerm 에는 없는 기능. global: 접두사로 앱이 비활성일 때도 동작한다.
+# tmux 세션과 별개로 잠깐 명령 하나 칠 때 쓴다.
+keybind = global:cmd+grave_accent=toggle_quick_terminal
 
 # ── 앱 레벨 (터미널이 직접 처리) ──────────────────────────
 keybind = cmd+c=copy_to_clipboard
