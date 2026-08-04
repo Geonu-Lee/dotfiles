@@ -200,8 +200,6 @@ cask "vlc"
 cask "wezterm"
 # Open-source version of the X.Org X Window System
 cask "xquartz"
-# Multiplayer code editor
-cask "zed"
 npm "@anthropic-ai/claude-code"
 npm "corepack"
 npm "pnpm"

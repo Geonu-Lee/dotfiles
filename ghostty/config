@@ -1,0 +1,149 @@
+# Ghostty — WezTerm 설정을 그대로 옮긴 것
+#
+# 리로드: Cmd+Shift+,        설정 열기: ghostty +edit-config
+# 테마 목록: ghostty +list-themes
+#
+# 설계: 레이아웃·세션은 전부 tmux 담당. 이 파일은 터미널 자체(폰트·색·IME·
+#       이미지 프로토콜)와 tmux 로 키를 넘기는 얇은 계층만 다룬다.
+
+# ── tmux 자동 시작 ────────────────────────────────────────
+# WezTerm: default_prog = { tmux, new-session, -A, -s, main }
+command = /opt/homebrew/bin/tmux new-session -A -s main
+
+# ── SSH / 원격 (최우선) ───────────────────────────────────
+# TERM=xterm-ghostty 가 원격에 없어 tmux 가 "missing or unsuitable terminal"
+# 로 죽는 것을 막는다. ssh-terminfo 가 원격에 terminfo 를 설치해 준다.
+shell-integration = zsh
+shell-integration-features = sudo,ssh-terminfo,ssh-env
+
+# ── 폰트 ──────────────────────────────────────────────────
+# WezTerm: font_with_fallback{FiraCode NF, MesloLGS NF, Symbols NF, Apple Color Emoji}
+# 여러 번 선언하면 앞에서부터 폴백된다.
+font-family = FiraCode Nerd Font
+font-family = MesloLGS NF
+font-family = Apple Color Emoji
+# WezTerm 설정에 있던 "Symbols Nerd Font" 는 이 머신에 미설치라 뺐다.
+# FiraCode Nerd Font 가 이미 Nerd 글리프를 포함하므로 실질 손실 없음.
+font-size = 15
+
+# 한글은 D2Coding 으로 (코드포인트 범위 지정 — WezTerm 보다 정밀함)
+font-codepoint-map = U+AC00-U+D7A3,U+1100-U+11FF,U+3130-U+318F=D2CodingLigature Nerd Font
+
+# ── 색 (Dracula 공식 팔레트 — WezTerm 설정과 동일한 값) ───
+# theme = Dracula 로도 되지만, 기존 값과 100% 동일하게 하려고 직접 지정.
+background = #282a36
+foreground = #f8f8f2
+cursor-color = #f8f8f2
+cursor-text = #282a36
+selection-background = #44475a
+selection-foreground = #f8f8f2
+
+palette = 0=#21222c
+palette = 1=#ff5555
+palette = 2=#50fa7b
+palette = 3=#f1fa8c
+palette = 4=#bd93f9
+palette = 5=#ff79c6
+palette = 6=#8be9fd
+palette = 7=#f8f8f2
+palette = 8=#6272a4
+palette = 9=#ff6e6e
+palette = 10=#69ff94
+palette = 11=#ffffa5
+palette = 12=#d6acff
+palette = 13=#ff92df
+palette = 14=#a4ffff
+palette = 15=#ffffff
+
+# ── 윈도우 ────────────────────────────────────────────────
+# WezTerm: window_decorations="RESIZE", padding 4, opacity 1.00, tab_bar 숨김
+macos-titlebar-style = hidden
+window-padding-x = 4
+window-padding-y = 4
+background-opacity = 1
+window-inherit-working-directory = true
+
+# ── 동작 ──────────────────────────────────────────────────
+macos-option-as-alt = true
+link-url = true
+mouse-hide-while-typing = true
+# 1.3.1 은 scrollback-limit (바이트). main 브랜치는 -lines/-bytes 로 분리됐으므로
+# 나중에 업그레이드하면 이름이 바뀔 수 있다. 기본값은 10000000.
+scrollback-limit = 10000000
+confirm-close-surface = false
+
+# ══════════════════════════════════════════════════════════
+# 키바인딩
+# ══════════════════════════════════════════════════════════
+# WezTerm 의 disable_default_key_bindings = true 에 해당
+keybind = clear
+
+# ── 앱 레벨 (터미널이 직접 처리) ──────────────────────────
+keybind = cmd+c=copy_to_clipboard
+keybind = cmd+v=paste_from_clipboard
+keybind = cmd+q=quit
+keybind = cmd+n=new_window
+keybind = cmd+shift+equal=increase_font_size:1
+keybind = cmd+shift+minus=decrease_font_size:1
+keybind = cmd+digit_0=reset_font_size
+
+# ── tmux 패스스루 ─────────────────────────────────────────
+# \x02 = Ctrl+B (tmux prefix). WezTerm 의 SendString 과 같은 방식.
+# 실제 동작은 전부 .tmux.conf / tmux.reset.conf 가 정의한다.
+
+# window 이동
+keybind = cmd+digit_1=text:\x021
+keybind = cmd+digit_2=text:\x022
+keybind = cmd+digit_3=text:\x023
+keybind = cmd+digit_4=text:\x024
+keybind = cmd+digit_5=text:\x025
+
+# window 생성/닫기, 이전·다음
+keybind = cmd+t=text:\x02c
+keybind = cmd+w=text:\x02x
+keybind = cmd+bracket_left=text:\x02H
+keybind = cmd+bracket_right=text:\x02L
+
+# 분할 — prefix+s 는 .tmux.conf 에서 Session 팝업으로 덮여 있으므로
+# 위아래 분할은 prefix+| 를 쓴다 (WezTerm 쪽은 아직 s 로 되어 있어 오동작 중)
+keybind = cmd+shift+d=text:\x02|
+keybind = cmd+shift+e=text:\x02v
+
+# pane 이동 — 방향키와 hjkl 둘 다
+keybind = cmd+arrow_left=text:\x02h
+keybind = cmd+arrow_right=text:\x02l
+keybind = cmd+arrow_up=text:\x02k
+keybind = cmd+arrow_down=text:\x02j
+keybind = cmd+h=text:\x02h
+keybind = cmd+l=text:\x02l
+keybind = cmd+k=text:\x02k
+keybind = cmd+j=text:\x02j
+
+# pane 크기 조절
+keybind = ctrl+shift+arrow_left=text:\x02,
+keybind = ctrl+shift+arrow_right=text:\x02.
+keybind = ctrl+shift+arrow_up=text:\x02=
+keybind = ctrl+shift+arrow_down=text:\x02-
+
+# 레이아웃 균등 · zoom
+keybind = cmd+equal=text:\x02e
+keybind = cmd+minus=text:\x02E
+keybind = cmd+z=text:\x02z
+
+# 팝업·선택기
+keybind = ctrl+backslash=text:\x02g
+keybind = ctrl+slash=text:\x02w
+keybind = ctrl+comma=text:\x02s
+keybind = cmd+shift+n=text:\x02S
+keybind = cmd+p=text:\x02p
+keybind = cmd+f=text:\x02f
+
+# ── 옮기지 못한 것 ────────────────────────────────────────
+# 1. Ctrl+1 / Ctrl+2 세션 전환 (WezTerm: background_child_process)
+#    Ghostty 에는 외부 명령 실행 액션이 없다 → .tmux.conf 로 옮겼다:
+#      bind -n C-1 run-shell "~/.config/tmux/scripts/session-switch.sh main"
+#
+# 2. Cmd+Shift+B 배경 이미지 토글 (WezTerm: set_config_overrides)
+#    Ghostty 에는 런타임 설정 변경 API 가 없다. background-image 는 고정.
+#    (원본 WezTerm 설정의 이미지 경로 ~/LJJ/dotfiles/dotfiles/b.jpg 는
+#     파일이 존재하지 않아 이미 동작하지 않던 상태였다)

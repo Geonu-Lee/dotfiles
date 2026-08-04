@@ -314,11 +314,10 @@ backup_and_link "$DOTFILES/starship/starship.toml" "$HOME/.config/starship/stars
 mkdir -p "$HOME/.config/yazi"
 backup_and_link "$DOTFILES/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
 
-# zed (Mac only) — themes/ 등 나머지는 Zed 가 관리하므로 두 파일만 링크
-if [[ "$OS" == "mac" ]]; then
-    mkdir -p "$HOME/.config/zed"
-    backup_and_link "$DOTFILES/zed/settings.json" "$HOME/.config/zed/settings.json"
-    backup_and_link "$DOTFILES/zed/keymap.json" "$HOME/.config/zed/keymap.json"
+# ghostty (Mac only) — WezTerm 과 병행. 설정 파일 하나뿐
+if [[ "$OS" == "mac" && -f "$DOTFILES/ghostty/config" ]]; then
+    mkdir -p "$HOME/.config/ghostty"
+    backup_and_link "$DOTFILES/ghostty/config" "$HOME/.config/ghostty/config"
 fi
 
 # tmux (Mac에서만 WezTerm과 함께 사용)
