@@ -26,7 +26,9 @@ for arg in "$@"; do
   case "$arg" in
     -n|--dry-run) DRY_RUN=1 ;;
     -h|--help)
-      grep '^#' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+      # 맨 위 헤더 블록만 출력 (파일 전체 주석이 아니라)
+      awk '/^# ={10,}/ { seen=1 } seen && /^#/ { sub(/^# ?/, ""); print; next } seen { exit }' "$0"
+      exit 0 ;;
     *) echo "알 수 없는 옵션: $arg (사용법: --dry-run | --help)"; exit 1 ;;
   esac
 done

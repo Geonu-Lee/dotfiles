@@ -3,11 +3,28 @@ set -euo pipefail
 
 # ============================================================================
 # Dotfiles Bootstrap
-# 사용법: bash ~/dotfiles/install.sh
+# 사용법:
+#   bash ~/dotfiles/install.sh              전체 (셸·터미널 환경 + Claude 설정)
+#   bash ~/dotfiles/install.sh --no-claude  Claude 설정을 빼고 설치
+#   bash ~/dotfiles/install.sh --help       도움말
+#
+# Claude 설정만 따로 하려면:  bash ~/dotfiles/claude/install.sh
 # 멱등성: 이미 설치된 도구는 스킵
 # ============================================================================
 
 DOTFILES="$(cd "$(dirname "$0")" && pwd)"
+
+WITH_CLAUDE=1
+for arg in ${@+"$@"}; do
+  case "$arg" in
+    --no-claude|--skip-claude) WITH_CLAUDE=0 ;;
+    -h|--help)
+      # 맨 위 헤더 블록만 출력 (파일 전체 주석이 아니라)
+      awk '/^# ={10,}/ { seen=1 } seen && /^#/ { sub(/^# ?/, ""); print; next } seen { exit }' "$0"
+      exit 0 ;;
+    *) echo "알 수 없는 옵션: $arg (사용법: --no-claude | --help)"; exit 1 ;;
+  esac
+done
 
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -75,7 +92,7 @@ backup_and_link() {
 if [[ "$OS" == "debian" ]]; then
     info "apt 패키지 설치..."
     sudo apt-get update -qq
-    # build-essential: nvim treesitter 컴파일 / ripgrep: LazyVim 검색 / ruby: tmuxinator
+    # build-essential: nvim treesitter 컴파일 / ripgrep: fzf-lua 그렙 / ruby: tmuxinator
     sudo apt-get install -y -qq \
         zsh git curl wget unzip xclip fontconfig \
         build-essential ripgrep tmux ruby-full > /dev/null 2>&1
@@ -232,7 +249,7 @@ else
 fi
 
 # --- neovim ---
-# Debian apt 의 neovim 은 LazyVim 요구치(0.9+)보다 낮은 경우가 많아 공식 릴리스를 쓴다.
+# Debian apt 의 neovim 은 플러그인 요구치(0.9+)보다 낮은 경우가 많아 공식 릴리스를 쓴다.
 nvim_version_ok() {
     command -v nvim &> /dev/null || return 1
     local major minor
@@ -314,22 +331,11 @@ backup_and_link "$DOTFILES/starship/starship.toml" "$HOME/.config/starship/stars
 mkdir -p "$HOME/.config/yazi"
 backup_and_link "$DOTFILES/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
 
-# ghostty (Mac only) — WezTerm 과 병행. 설정 파일 하나뿐
-if [[ "$OS" == "mac" && -f "$DOTFILES/ghostty/config" ]]; then
-    mkdir -p "$HOME/.config/ghostty"
-    backup_and_link "$DOTFILES/ghostty/config" "$HOME/.config/ghostty/config"
-fi
-
-# tmux (Mac에서만 WezTerm과 함께 사용)
+# tmux — 기본값을 쓰므로 설정 파일 하나뿐 (history-limit + mouse)
 backup_and_link "$DOTFILES/tmux/.tmux.conf" "$HOME/.tmux.conf"
-mkdir -p "$HOME/.config/tmux"
-backup_and_link "$DOTFILES/tmux/tmux.reset.conf" "$HOME/.config/tmux/tmux.reset.conf"
-if [[ -d "$DOTFILES/tmux/scripts" ]]; then
-    ln -sfn "$DOTFILES/tmux/scripts" "$HOME/.config/tmux/scripts"
-fi
 
-# nvim (LazyVim) — 디렉토리 통째로 심링크.
-# lazy-lock.json / lazyvim.json 은 nvim 이 직접 갱신하므로 링크여야 repo 에 반영된다.
+# nvim — 디렉토리 통째로 심링크.
+# lazy-lock.json 은 nvim 이 직접 갱신하므로 링크여야 repo 에 반영된다.
 if [[ -e "$HOME/.config/nvim" && ! -L "$HOME/.config/nvim" ]]; then
     mv "$HOME/.config/nvim" "$HOME/.config/nvim.bak.$(date +%Y%m%d%H%M%S)"
     info "기존 ~/.config/nvim 백업"
@@ -337,14 +343,6 @@ fi
 mkdir -p "$HOME/.config"
 ln -sfn "$DOTFILES/nvim" "$HOME/.config/nvim"
 ok "symlink ~/.config/nvim → $DOTFILES/nvim"
-
-# wezterm (Mac only)
-if [[ "$OS" == "mac" ]]; then
-    mkdir -p "$HOME/.config/wezterm"
-    for f in "$DOTFILES"/wezterm/*.lua; do
-        backup_and_link "$f" "$HOME/.config/wezterm/$(basename "$f")"
-    done
-fi
 
 # ============================================================================
 # 5. ~/.zshrc.local (없을 때만 예시 복사)
@@ -358,7 +356,7 @@ fi
 
 # ============================================================================
 # 5.3 Finder 기본 앱 → 터미널 (macOS)
-#     md/json/yaml/소스코드를 더블클릭하면 WezTerm 새 창의 nvim/jless/glow 로 열린다.
+#     md/json/yaml/소스코드를 더블클릭하면 Terminal.app 새 창의 nvim 으로 열린다.
 # ============================================================================
 if [[ "$OS" == "mac" && -f "$DOTFILES/macos/build-open-in-terminal.sh" ]]; then
     echo ""
@@ -368,9 +366,12 @@ if [[ "$OS" == "mac" && -f "$DOTFILES/macos/build-open-in-terminal.sh" ]]; then
 fi
 
 # ============================================================================
-# 5.5 Claude Code 설정 (있을 때만)
+# 5.5 Claude Code 설정 (--no-claude 로 건너뛸 수 있음)
 # ============================================================================
-if [[ -f "$DOTFILES/claude/install.sh" ]]; then
+if [[ "$WITH_CLAUDE" == "0" ]]; then
+    echo ""
+    warn "Claude 설정 건너뜀 (--no-claude). 나중에: bash $DOTFILES/claude/install.sh"
+elif [[ -f "$DOTFILES/claude/install.sh" ]]; then
     echo ""
     info "Claude Code 설정 설치..."
     bash "$DOTFILES/claude/install.sh"

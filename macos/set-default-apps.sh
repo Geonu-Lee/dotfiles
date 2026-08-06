@@ -3,21 +3,26 @@ set -euo pipefail
 
 # ============================================================================
 # Finder 기본 앱 지정
-#   기본값은 Zed. 터미널(nvim)로 열고 싶으면 인자로 번들 ID 를 넘긴다:
-#     set-default-apps.sh                      → Zed
-#     set-default-apps.sh local.openinterminal → WezTerm + nvim
+#   기본값은 OpenInTerminal (Terminal.app 새 창의 nvim). 다른 앱으로 보내려면
+#   인자로 번들 ID 를 넘긴다:
+#     set-default-apps.sh                      → Terminal.app + nvim
+#     set-default-apps.sh com.apple.TextEdit   → TextEdit
 #
 #   되돌리려면: duti -s com.apple.TextEdit <확장자> all
 # ============================================================================
 
-BUNDLE_ID="${1:-dev.zed.Zed}"
+BUNDLE_ID="${1:-local.openinterminal}"
 
-command -v duti >/dev/null 2>&1 || { echo "duti 가 없습니다: brew install duti"; exit 1; }
+# install.sh 가 set -e 로 부르므로 여기서 실패해도 0 으로 빠진다.
+# Finder 연동 하나 때문에 Claude 설정·기본 셸 변경까지 건너뛰면 손해가 크다.
+command -v duti >/dev/null 2>&1 || { echo "duti 가 없습니다 (brew install duti) — 건너뜁니다."; exit 0; }
 
-# 대상 앱이 실제로 있는지 확인 (없는 앱을 지정하면 Finder 가 깨진다)
+# 대상 앱이 실제로 있는지 확인 (없는 앱을 지정하면 Finder 가 깨진다).
+# install.sh 가 set -e 로 부르므로, 여기서 exit 1 하면 그 뒤 단계(Claude 설정·
+# 기본 셸 변경)까지 통째로 중단된다. 경고만 하고 0 으로 빠진다.
 if ! mdfind "kMDItemCFBundleIdentifier == '$BUNDLE_ID'" 2>/dev/null | grep -q .; then
-    echo "번들 ID '$BUNDLE_ID' 인 앱을 찾을 수 없습니다."
-    exit 1
+    echo "번들 ID '$BUNDLE_ID' 인 앱을 찾을 수 없습니다 — Finder 기본 앱 지정을 건너뜁니다."
+    exit 0
 fi
 echo "핸들러: $BUNDLE_ID"
 echo ""
