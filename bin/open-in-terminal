@@ -3,14 +3,15 @@ set -euo pipefail
 
 # ============================================================================
 # Finder → nvim
-#   Finder에서 더블클릭한 파일을 WezTerm 새 창의 nvim 으로 연다.
+#   Finder에서 더블클릭한 파일을 Terminal.app 새 창의 nvim 으로 연다.
 #   OpenInTerminal.app (AppleScript 래퍼) 이 이 스크립트를 호출한다.
 #
 #   사용법:  open-in-terminal <파일>
 #            open-in-terminal --no-file    파일 없이 셸만
 #
-#   특정 확장자를 다른 도구로 보내고 싶으면 (예: json → jless) 아래에
-#   case 분기를 넣으면 된다. 단 jless/glow 는 읽기 전용이라 편집이 안 된다.
+#   Terminal.app 은 `open -a` 로 명령을 넘길 수 없어서 osascript 의 `do script`
+#   를 쓴다. AppleScript 의 `quoted form of` 가 셸 인용을 처리하므로 공백·
+#   따옴표가 든 경로도 안전하다.
 # ============================================================================
 
 BIN="/opt/homebrew/bin"
@@ -19,7 +20,16 @@ BIN="/opt/homebrew/bin"
 file="${1:?열 파일 경로가 필요합니다 (또는 --no-file)}"
 
 if [[ "$file" == "--no-file" ]]; then
-    exec "$BIN/wezterm" start --always-new-process
+    exec open -a Terminal
 fi
 
-exec "$BIN/wezterm" start --always-new-process -- "$BIN/nvim" "$file"
+exec osascript - "$BIN/nvim" "$file" <<'APPLESCRIPT'
+on run argv
+	set nvimPath to item 1 of argv
+	set filePath to item 2 of argv
+	tell application "Terminal"
+		do script (quoted form of nvimPath & " " & quoted form of filePath)
+		activate
+	end tell
+end run
+APPLESCRIPT

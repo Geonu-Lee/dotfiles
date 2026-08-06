@@ -196,8 +196,6 @@ cask "stats"
 cask "synology-drive"
 # Multimedia player
 cask "vlc"
-# GPU-accelerated cross-platform terminal emulator and multiplexer
-cask "wezterm"
 # Open-source version of the X.Org X Window System
 cask "xquartz"
 npm "@anthropic-ai/claude-code"

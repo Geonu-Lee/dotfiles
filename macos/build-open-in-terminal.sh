@@ -20,7 +20,19 @@ build_app() {
     local plist="$app/Contents/Info.plist"
 
     rm -rf "$app"
-    osacompile -o "$app" "$SRC/$script"
+
+    # __OPEN_IN_TERMINAL__ 를 이 repo 의 실제 경로로 치환한 뒤 컴파일한다.
+    # 예전에는 스크립트가 $HOME/dotfiles 를 하드코딩해서, repo 를 다른 곳에
+    # clone 하면 더블클릭해도 조용히 아무 일도 일어나지 않았다.
+    local helper="$(cd "$SRC/.." && pwd)/bin/open-in-terminal"
+    [[ -x "$helper" ]] || { echo "  실행 가능한 $helper 가 없습니다"; return 1; }
+
+    # osacompile 은 확장자로 소스를 판별하므로 임시 디렉토리에 같은 이름으로 만든다
+    local tmpdir
+    tmpdir="$(mktemp -d)"
+    sed "s|__OPEN_IN_TERMINAL__|\\\\\"$helper\\\\\"|g" "$SRC/$script" > "$tmpdir/$script"
+    osacompile -o "$app" "$tmpdir/$script"
+    rm -rf "$tmpdir"
 
     # osacompile 은 CFBundleIdentifier 를 만들지 않는다. duti 가 이 값으로 앱을 지정하므로 필수.
     /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string $bundle_id" "$plist"
