@@ -16,7 +16,7 @@ claude/
 ├── statusline.sh                    # 상태줄 (모델·컨텍스트 게이지·git·사용량·경로)
 ├── keybindings.json                 # 키맵 (transcript 뷰 vim 스크롤 u/d)
 ├── themes/                          # 커스텀 컬러 테마
-│   └── catppuccin-mocha.json        #   settings.json 의 "custom:<파일명>" 으로 지정
+│   └── catppuccin-mocha.json        #   다크 테마. 현재 비활성(theme: "light")
 ├── commands/                        # 커스텀 슬래시 커맨드
 │   └── review-diff.md               #   review-diff.md → /review-diff
 ├── agents/                          # 커스텀 서브에이전트

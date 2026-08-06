@@ -43,7 +43,7 @@ opt.undofile = true -- nvim 을 닫아도 undo 이력 유지
 opt.swapfile = false
 opt.backup = false
 
-opt.termguicolors = true -- 24bit 색 (Ghostty 가 RGB 지원)
+opt.termguicolors = true -- 24bit 색 (지원하는 터미널에서만 효과. Terminal.app 은 256색)
 opt.updatetime = 250 -- 진단·gitsigns 반응 속도
 opt.timeoutlen = 400 -- 키 조합 대기 시간
 opt.mouse = "a"

@@ -3,7 +3,7 @@
 -- glow 와 달리 읽기 전용이 아니라 편집 중에도 렌더링된다.
 --
 -- snacks.image 와 함께 쓰면 마크다운 안의 이미지까지 인라인으로 보인다
--- (Ghostty 의 kitty graphics 필요).
+-- (kitty graphics 지원 터미널 필요 — Terminal.app 은 미지원).
 return {
   {
     "MeanderingProgrammer/render-markdown.nvim",

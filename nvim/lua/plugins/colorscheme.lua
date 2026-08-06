@@ -1,4 +1,4 @@
--- 터미널(Ghostty)·tmux 와 같은 Dracula 로 통일
+-- Dracula. 터미널이 트루컬러를 지원하면 정확한 색, 아니면 256색 근사로 나온다
 return {
   {
     "Mofiqul/dracula.nvim",

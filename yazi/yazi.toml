@@ -20,7 +20,7 @@ max_height = 1000
 # 탭 너비
 tab_size = 2
 
-# 이미지 어댑터 (WezTerm + tmux)
+# 이미지 프리뷰 관련 (Terminal.app 은 이미지 프로토콜 미지원 — 값만 남겨둠)
 image_filter = "triangle"
 image_quality = 75
 sixel_fraction = 15
