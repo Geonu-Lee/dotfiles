@@ -194,7 +194,7 @@ alias .....="cd ../../../.."
 alias ......="cd ../../../../.."
 
 # ============================================================================
-# Aliases: SSH (xterm-ghostty terminfo 없는 서버 대응)
+# Aliases: SSH (원격에 terminfo 없는 TERM 대응)
 # ============================================================================
 alias ssh='TERM=xterm-256color ssh'
 
@@ -295,6 +295,3 @@ fi
 # Machine-local overrides (cuda, nvim path, etc.)
 # ============================================================================
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
-
-# OpenClaw Completion
-source "/Users/ijongjin/.openclaw/completions/openclaw.zsh"
