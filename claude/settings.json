@@ -6,11 +6,7 @@
   "alwaysThinkingEnabled": true,
   "skipDangerousModePermissionPrompt": true,
   "tui": "fullscreen",
-  "theme": "custom:catppuccin-mocha",
-  "editorMode": "vim",
-  "vimInsertModeRemaps": {
-    "jj": "<Esc>"
-  },
+  "theme": "light",
   "voice": {
     "enabled": true,
     "mode": "hold"
@@ -36,15 +32,22 @@
     ]
   },
   "enabledPlugins": {
+    "academic-research-skills@academic-research-skills": true,
+    "frontend-design@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "ui-ux-pro-max@ui-ux-pro-max-skill": true,
     "skill-creator@claude-plugins-official": true,
     "understand-anything@understand-anything": true,
     "agentmemory@agentmemory": true,
-    "feature-dev@claude-plugins-official": true,
-    "warp@claude-code-warp": true
+    "feature-dev@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
+    "academic-research-skills": {
+      "source": {
+        "source": "github",
+        "repo": "Imbad0202/academic-research-skills"
+      }
+    },
     "ui-ux-pro-max-skill": {
       "source": {
         "source": "github",
@@ -61,12 +64,6 @@
       "source": {
         "source": "github",
         "repo": "rohitg00/agentmemory"
-      }
-    },
-    "claude-code-warp": {
-      "source": {
-        "source": "github",
-        "repo": "warpdotdev/claude-code-warp"
       }
     }
   }
