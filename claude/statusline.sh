@@ -1,18 +1,22 @@
 #!/bin/bash
-# Claude Code statusline — Catppuccin Mocha
+# Claude Code statusline — Catppuccin Latte (밝은 배경용)
 # stdin으로 세션 JSON을 받아 한 줄 상태줄을 출력한다.
 
 input=$(cat)
 
-MAUVE='\033[38;2;203;166;247m'
-BLUE='\033[38;2;137;180;250m'
-GREEN='\033[38;2;166;227;161m'
-YELLOW='\033[38;2;249;226;175m'
-RED='\033[38;2;243;139;168m'
-PEACH='\033[38;2;250;179;135m'
-GRAY='\033[38;2;108;112;134m'
-TEAL='\033[38;2;148;226;213m'
+MAUVE='\033[38;2;136;57;239m'   # #8839ef
+BLUE='\033[38;2;30;102;245m'    # #1e66f5
+GREEN='\033[38;2;64;160;43m'    # #40a02b
+YELLOW='\033[38;2;223;142;29m'  # #df8e1d
+RED='\033[38;2;210;15;57m'      # #d20f39
+PEACH='\033[38;2;254;100;11m'   # #fe640b
+GRAY='\033[38;2;140;143;161m'   # #8c8fa1
+TEAL='\033[38;2;23;146;153m'    # #179299
 RESET='\033[0m'
+
+# 다크 테마(Catppuccin Mocha)로 되돌릴 때 쓸 값:
+#   MAUVE 203;166;247  BLUE 137;180;250  GREEN 166;227;161  YELLOW 249;226;175
+#   RED   243;139;168  PEACH 250;179;135  GRAY  108;112;134  TEAL   148;226;213
 
 model=$(echo "$input" | jq -r '.model.display_name // "?"')
 ctx=$(echo "$input" | jq -r '.context_window.used_percentage // 0 | floor')
